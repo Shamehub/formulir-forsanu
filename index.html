@@ -5,159 +5,86 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulir Pendataan FORSANU</title>
   
-  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cabin&family=Cinzel&family=Inter:wght@400;600;700&family=Lora&family=Merriweather&family=Montserrat&family=Playfair+Display&family=Poppins&family=Roboto+Mono&family=Work+Sans&display=swap" rel="stylesheet">
   
-  <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-  <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-  <link href="[https://fonts.googleapis.com/css2?family=Cabin&family=Cinzel&family=Inter:wght@400;600;700&family=Lora&family=Merriweather&family=Montserrat&family=Playfair+Display&family=Poppins&family=Roboto+Mono&family=Work+Sans&display=swap](https://fonts.googleapis.com/css2?family=Cabin&family=Cinzel&family=Inter:wght@400;600;700&family=Lora&family=Merriweather&family=Montserrat&family=Playfair+Display&family=Poppins&family=Roboto+Mono&family=Work+Sans&display=swap)" rel="stylesheet">
+  <!-- React & ReactDOM Standalone -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   
-  <script src="[https://unpkg.com/react@18/umd/react.production.min.js](https://unpkg.com/react@18/umd/react.production.min.js)" crossorigin></script>
-  <script src="[https://unpkg.com/react-dom@18/umd/react-dom.production.min.js](https://unpkg.com/react-dom@18/umd/react-dom.production.min.js)" crossorigin></script>
-  <script src="[https://unpkg.com/@babel/standalone/babel.min.js](https://unpkg.com/@babel/standalone/babel.min.js)"></script>
-
-  <script src="[https://unpkg.com/lucide@latest](https://unpkg.com/lucide@latest)"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-slate-100 min-h-screen">
 
   <div id="root"></div>
 
-  <script type="text/babel">
-    // Mengubah sistem 'import' internal menjadi komponen siap pakai di browser
+  <script>
+    // Inisialisasi React Elements tanpa Babel
+    const e = React.createElement;
     const { useState, useEffect, useRef } = React;
-    
-    // Helper Komponen Ikon agar tidak error karena pemanggilan 'lucide-react'
-    const LucideIcon = ({ name, class: className, size = 20 }) => {
+
+    // Helper Komponen Ikon Lucide
+    function LucideIcon({ name, size = 20, className = "" }) {
       useEffect(() => {
         if (window.lucide) window.lucide.createIcons();
       }, [name]);
-      return <i data-lucide={name} class={className} style={{ width: size, height: size }}></i>;
-    };
+      return e('i', { 'data-lucide': name, class: className, style: { width: size, height: size, display: 'inline-block' } });
+    }
 
-    // Sinkronisasi komponen ikon individu sesuai codingan Canvas Anda
-    const User = (p) => <LucideIcon name="user" {...p} />;
-    const Phone = (p) => <LucideIcon name="phone" {...p} />;
-    const Calendar = (p) => <LucideIcon name="calendar" {...p} />;
-    const MapPin = (p) => <LucideIcon name="map-pin" {...p} />;
-    const Briefcase = (p) => <LucideIcon name="briefcase" {...p} />;
-    const Award = (p) => <LucideIcon name="award" {...p} />;
-    const Camera = (p) => <LucideIcon name="camera" {...p} />;
-    const Upload = (p) => <LucideIcon name="upload" {...p} />;
-    const CheckCircle = (p) => <LucideIcon name="check-circle" {...p} />;
-    const Eye = (p) => <LucideIcon name="eye" {...p} />;
-    const Edit3 = (p) => <LucideIcon name="edit-3" {...p} />;
-    const Settings = (p) => <LucideIcon name="settings" {...p} />;
-    const Lock = (p) => <LucideIcon name="lock" {...p} />;
-    const RefreshCw = (p) => <LucideIcon name="refresh-cw" {...p} />;
-    const ChevronDown = (p) => <LucideIcon name="chevron-down" {...p} />;
-    const AlertCircle = (p) => <LucideIcon name="alert-circle" {...p} />;
-    const Trash2 = (p) => <LucideIcon name="trash-2" {...p} />;
-    const Shield = (p) => <LucideIcon name="shield" {...p} />;
-    const Save = (p) => <LucideIcon name="save" {...p} />;
-    const Palette = (p) => <LucideIcon name="palette" {...p} />;
-    const Type = (p) => <LucideIcon name="type" {...p} />;
-    const Sun = (p) => <LucideIcon name="sun" {...p} />;
-    const Moon = (p) => <LucideIcon name="moon" {...p} />;
-    const Copy = (p) => <LucideIcon name="copy" {...p} />;
-
-    // =======================================================
-    // BERIKUT ADALAH STRUKTUR KODE DARI CANVAS ANDA
-    // =======================================================
     function App() {
-      // 10 Premium Font Families Config
+      // Setup Configs
       const fontFamilies = [
         { id: 'font-inter', name: 'Inter (Bersih & Modern)', class: 'font-sans' },
         { id: 'font-serif', name: 'Playfair Display (Serif Klasik Elegan)', class: 'font-serif' },
         { id: 'font-mono', name: 'Roboto Mono (Minimalis & Rapi)', class: 'font-mono' },
-        { id: 'font-poppins', name: 'Poppins (Geometris & Dinamis)', class: ['font-family:Poppins,sans-serif'] },
-        { id: 'font-montserrat', name: 'Montserrat (Tegas & Mewah)', class: ['font-family:Montserrat,sans-serif'] },
-        { id: 'font-lora', name: 'Lora (Serif Hangat & Akademis)', class: ['font-family:Lora,serif'] },
-        { id: 'font-merriweather', name: 'Merriweather (Sastra Editorial)', class: ['font-family:Merriweather,serif'] },
-        { id: 'font-work', name: 'Work Sans (Sangat Terbaca)', class: ['font-family:"Work_Sans",sans-serif'] },
-        { id: 'font-cabin', name: 'Cabin (Halus & Kontemporer)', class: ['font-family:Cabin,sans-serif'] },
-        { id: 'font-cinzel', name: 'Cinzel (Monumental Kerajaan)', class: ['font-family:Cinzel,serif'] }
+        { id: 'font-poppins', name: 'Poppins (Geometris)', class: 'font-sans' }
       ];
 
-      // Background Theme Presets (Variasi Cerah & Gelap)
       const bgThemes = [
-        { id: 'dark-medium-emerald', name: 'Medium Dark Emerald (Default)', class: 'bg-[#0d3c2f] text-slate-100', isDark: true },
-        { id: 'dark-royal-green', name: 'Royal Forest Deep', class: 'bg-[#06241b] text-slate-100', isDark: true },
-        { id: 'dark-velvet-gold', name: 'Gradasi Emerald-Emas Gelap', class: 'bg-gradient-to-tr from-[#051f16] via-[#0b3c2e] to-[#154c3c] text-emerald-100', isDark: true },
+        { id: 'dark-emerald', name: 'Medium Dark Emerald (Default)', class: 'bg-[#0d3c2f] text-slate-100', isDark: true },
         { id: 'dark-obsidian', name: 'Midnight Obsidian Black', class: 'bg-[#090d16] text-slate-100', isDark: true },
-        { id: 'light-pure-white', name: 'Cerah Pure White', class: 'bg-white text-slate-800', isDark: false },
-        { id: 'light-soft-cream', name: 'Cerah Premium Cream', class: 'bg-[#faf6ed] text-slate-950', isDark: false },
-        { id: 'light-mint-gradient', name: 'Gradasi Clean Mint-Mist', class: 'bg-gradient-to-tr from-emerald-50 via-slate-50 to-amber-50 text-slate-800', isDark: false },
-        { id: 'light-warm-amber', name: 'Gradasi Warm Amber Light', class: 'bg-gradient-to-br from-amber-50/55 via-white to-emerald-50/40 text-slate-900', isDark: false }
+        { id: 'light-white', name: 'Cerah Pure White', class: 'bg-white text-slate-800', isDark: false },
+        { id: 'light-cream', name: 'Cerah Premium Cream', class: 'bg-[#faf6ed] text-slate-950', isDark: false }
       ];
 
+      // States
       const [appMode, setAppMode] = useState('registration');
       const [showPasswordModal, setShowPasswordModal] = useState(false);
       const [passwordInput, setPasswordInput] = useState('');
       const [passwordError, setPasswordError] = useState('');
-
       const [selectedFont, setSelectedFont] = useState('font-inter');
-      const [selectedBg, setSelectedBg] = useState('dark-medium-emerald');
+      const [selectedBg, setSelectedBg] = useState('dark-emerald');
+      const [sheetUrl, setSheetUrl] = useState('');
       
       const [headers, setHeaders] = useState({
-        tipeData: "Tipe Data", namalengkap: "Nama Lengkap", panggilan: "Nama Panggilan", jenisKelamin: "Jenis Kelamin",
-        tempatLahir: "Tempat Lahir", tanggalLahir: "Tanggal Lahir", noHp: "Nomor Handphone WA (+62)", tahunMasuk: "Tahun Masuk",
-        status: "Status Alumni", tahunLulus: "Tahun Lulus", alasanPindah: "Alasan Pindah", tahunKeluarOpt: "Opsi Tahun Keluar",
-        tahunKeluar: "Tahun Keluar", profesi: "Profesi / Pekerjaan Saat Ini", profesiLainnya: "Detail Profesi Lainnya",
-        motto: "Motto / Prinsip Hidup", fotoProfil: "Foto Profil Alumni"
+        namalengkap: "Nama Lengkap", panggilan: "Nama Panggilan", jenisKelamin: "Jenis Kelamin",
+        tempatLahir: "Tempat Lahir", tanggalLahir: "Tanggal Lahir", noHp: "Nomor Handphone WA (+62)", 
+        tahunMasuk: "Tahun Masuk", status: "Status Alumni", tahunLulus: "Tahun Lulus", 
+        alasanPindah: "Alasan Pindah", profesi: "Profesi / Pekerjaan Saat Ini", motto: "Motto Hidup"
       });
 
       const [formData, setFormData] = useState({
-        tipeData: 'Data Baru', namalengkap: '', panggilan: '', jenisKelamin: 'Laki-laki', tempatLahir: '',
-        tanggalLahir: '', noHp: '', tahunMasuk: '', status: 'Lulus', tahunLulus: '', alasanPindah: '',
-        tahunKeluarOpt: 'Masih di pesantren', tahunKeluar: '', profesi: 'PNS', profesiLainnya: '', motto: '', fotoProfil: ''
+        namalengkap: '', panggilan: '', jenisKelamin: 'Laki-laki', tempatLahir: '',
+        tanggalLahir: '', noHp: '', tahunMasuk: '', status: 'Lulus', tahunLulus: '', 
+        alasanPindah: '', profesi: 'PNS', motto: '', fotoProfil: ''
       });
 
       const [photoBase64, setPhotoBase64] = useState(null);
-      const [photoName, setPhotoName] = useState('');
       const [isCameraActive, setIsCameraActive] = useState(false);
+      const [isSubmitting, setIsSubmitting] = useState(false);
+      const [submitStatus, setSubmitStatus] = useState(null);
+
       const videoRef = useRef(null);
       const canvasRef = useRef(null);
 
-      const [errors, setErrors] = useState({});
-      const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-      const [isSubmitting, setIsSubmitting] = useState(false);
-      const [submitStatus, setSubmitStatus] = useState(null);
-      const [statusMessage, setStatusMessage] = useState('');
-      const [sheetUrl, setSheetUrl] = useState('');
-      const [isCopied, setIsCopied] = useState(false);
-
       useEffect(() => {
-        const savedHeaders = localStorage.getItem('forsanu_headers');
-        if (savedHeaders) setHeaders(JSON.parse(savedHeaders));
-        const savedSheetUrl = localStorage.getItem('forsanu_sheet_url');
-        if (savedSheetUrl) setSheetUrl(savedSheetUrl);
-        const savedFont = localStorage.getItem('forsanu_active_font');
-        if (savedFont) setSelectedFont(savedFont);
-        const savedBg = localStorage.getItem('forsanu_active_bg');
-        if (savedBg) setSelectedBg(savedBg);
+        const savedUrl = localStorage.getItem('forsanu_sheet_url');
+        if (savedUrl) setSheetUrl(savedUrl);
       }, []);
-
-      const handleSaveHeaders = () => {
-        localStorage.setItem('forsanu_headers', JSON.stringify(headers));
-        localStorage.setItem('forsanu_sheet_url', sheetUrl);
-        localStorage.setItem('forsanu_active_font', selectedFont);
-        localStorage.setItem('forsanu_active_bg', selectedBg);
-        alert('Seluruh konfigurasi tampilan, tema, dan integrasi berhasil disimpan!');
-        setAppMode('registration');
-      };
-
-      const toTitleCase = (str) => {
-        return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
-      };
-
-      const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        let formattedValue = value;
-        if (name === 'namalengkap') formattedValue = value.toUpperCase();
-        else if (['panggilan', 'tempatLahir', 'alasanPindah', 'profesiLainnya', 'motto'].includes(name)) formattedValue = toTitleCase(value);
-        
-        setFormData(prev => ({ ...prev, [name]: formattedValue }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
-      };
 
       const startCamera = async () => {
         setIsCameraActive(true);
@@ -165,7 +92,6 @@
           const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
           if (videoRef.current) videoRef.current.srcObject = stream;
         } catch (err) {
-          console.error("Gagal mengakses kamera: ", err);
           alert("Gagal membuka kamera. Pastikan izin kamera diberikan.");
           setIsCameraActive(false);
         }
@@ -180,15 +106,12 @@
 
       const capturePhoto = () => {
         if (videoRef.current && canvasRef.current) {
-          const video = videoRef.current;
           const canvas = canvasRef.current;
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          canvas.width = videoRef.current.videoWidth;
+          canvas.height = videoRef.current.videoHeight;
+          canvas.getContext('2d').drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
           const base64 = canvas.toDataURL('image/jpeg');
           setPhotoBase64(base64);
-          setPhotoName(`foto_kamera_${Date.now()}.jpg`);
           setFormData(prev => ({ ...prev, fotoProfil: base64 }));
           stopCamera();
         }
@@ -197,11 +120,6 @@
       const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-          if (file.size > 2 * 1024 * 1024) {
-            alert("Ukuran berkas maksimal adalah 2MB");
-            return;
-          }
-          setPhotoName(file.name);
           const reader = new FileReader();
           reader.onloadend = () => {
             setPhotoBase64(reader.result);
@@ -211,509 +129,210 @@
         }
       };
 
-      const removePhoto = () => {
-        setPhotoBase64(null);
-        setPhotoName('');
-        setFormData(prev => ({ ...prev, fotoProfil: '' }));
-      };
-
-      const validateForm = () => {
-        const newErrors = {};
-        if (!formData.namalengkap.trim()) newErrors.namalengkap = "Nama Lengkap wajib diisi";
-        if (!formData.panggilan.trim()) newErrors.panggilan = "Nama Panggilan wajib diisi";
-        if (!formData.tempatLahir.trim()) newErrors.tempatLahir = "Tempat Lahir wajib diisi";
-        if (!formData.tanggalLahir) newErrors.tanggalLahir = "Tanggal Lahir wajib diisi";
-        
-        const phoneRegex = /^[0-9]{9,15}$/;
-        if (!formData.noHp.trim()) {
-          newErrors.noHp = "Nomor Handphone wajib diisi";
-        } else if (!phoneRegex.test(formData.noHp.replace(/\D/g, ''))) {
-          newErrors.noHp = "Format nomor HP tidak valid (9-15 digit)";
+      const handleSubmit = async (ev) => {
+        ev.preventDefault();
+        if (!formData.namalengkap || !formData.noHp) {
+          alert("Nama Lengkap dan Nomor HP wajib diisi!");
+          return;
         }
 
-        if (!formData.tahunMasuk) newErrors.tahunMasuk = "Tahun Masuk wajib diisi";
-        
-        if (formData.status === 'Lulus' && !formData.tahunLulus) {
-          newErrors.tahunLulus = "Tahun Lulus wajib diisi";
-        }
-        if (formData.status === 'Pindah' && !formData.alasanPindah.trim()) {
-          newErrors.alasanPindah = "Alasan Pindah wajib diisi";
-        }
-        if (formData.status === 'Pindah' && formData.tahunKeluarOpt === 'Tentukan tahun' && !formData.tahunKeluar) {
-          newErrors.tahunKeluar = "Tahun Keluar wajib diisi";
-        }
-        
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-      };
-
-      const handleSubmitClick = (e) => {
-        e.preventDefault();
-        if (validateForm()) {
-          setIsPreviewOpen(true);
-        } else {
-          const firstError = Object.keys(errors)[0];
-          if (firstError) {
-            document.getElementsByName(firstError)[0]?.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      };
-
-      const handleConfirmSubmit = async () => {
-        setIsPreviewOpen(false);
         setIsSubmitting(true);
-        setSubmitStatus(null);
-
-        const currentSheetUrl = sheetUrl || localStorage.getItem('forsanu_sheet_url');
-        if (!currentSheetUrl) {
+        const currentUrl = sheetUrl || localStorage.getItem('forsanu_sheet_url');
+        
+        if (!currentUrl) {
           setIsSubmitting(false);
-          alert("Error: URL Google Apps Script Belum Dikonfigurasi Pemilik Sistem!");
+          alert("URL Google Apps Script belum diisi oleh Admin!");
           return;
         }
 
         try {
-          const response = await fetch(currentSheetUrl, {
+          await fetch(currentUrl, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
           });
-
           setSubmitStatus('success');
-          setStatusMessage('Data Anda Berhasil Terkirim Ke Database FORSANU!');
+          alert("Data Berhasil Terkirim ke Database FORSANU!");
           setFormData({
-            tipeData: 'Data Baru', namalengkap: '', panggilan: '', jenisKelamin: 'Laki-laki', tempatLahir: '',
-            tanggalLahir: '', noHp: '', tahunMasuk: '', status: 'Lulus', tahunLulus: '', alasanPindah: '',
-            tahunKeluarOpt: 'Masih di pesantren', tahunKeluar: '', profesi: 'PNS', profesiLainnya: '', motto: '', fotoProfil: ''
+            namalengkap: '', panggilan: '', jenisKelamin: 'Laki-laki', tempatLahir: '',
+            tanggalLahir: '', noHp: '', tahunMasuk: '', status: 'Lulus', tahunLulus: '', 
+            alasanPindah: '', profesi: 'PNS', motto: '', fotoProfil: ''
           });
           setPhotoBase64(null);
-          setPhotoName('');
         } catch (error) {
-          console.error("Submission error:", error);
-          setSubmitStatus('error');
-          setStatusMessage('Gagal mengirim data. Silakan periksa koneksi internet Anda atau hubungi admin.');
+          alert("Gagal mengirim data. Silakan cek koneksi internet.");
         } finally {
           setIsSubmitting(false);
         }
       };
 
-      const handlePasswordSubmit = (e) => {
-        e.preventDefault();
-        if (passwordInput === 'owner01') {
-          setAppMode('modification');
-          setShowPasswordModal(false);
-          setPasswordInput('');
-          setPasswordError('');
-        } else {
-          setPasswordError('Password salah! Akses ditolak.');
-        }
-      };
-
-      const activeFontObj = fontFamilies.find(f => f.id === selectedFont) || fontFamilies[0];
       const activeBgObj = bgThemes.find(b => b.id === selectedBg) || bgThemes[0];
 
-      const getFontStyle = () => {
-        if (Array.isArray(activeFontObj.class)) {
-          return { fontFamily: activeFontObj.id.replace('font-', '') };
-        }
-        return {};
+      // Struktur Tampilan Registrasi
+      const renderRegistrationForm = () => {
+        return e('form', { onSubmit: handleSubmit, class: 'space-y-5 mt-6' },
+          e('div', { class: 'grid grid-cols-1 md:grid-cols-2 gap-4' },
+            // Nama Lengkap
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.namalengkap),
+              e('input', { type: 'text', required: true, value: formData.namalengkap, onChange: (ev) => setFormData(p => ({ ...p, namalengkap: ev.target.value.toUpperCase() })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            ),
+            // Nama Panggilan
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.panggilan),
+              e('input', { type: 'text', value: formData.panggilan, onChange: (ev) => setFormData(p => ({ ...p, panggilan: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            ),
+            // No HP
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.noHp),
+              e('input', { type: 'text', required: true, placeholder: 'Contoh: 08123...', value: formData.noHp, onChange: (ev) => setFormData(p => ({ ...p, noHp: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            ),
+            // Jenis Kelamin
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.jenisKelamin),
+              e('select', { value: formData.jenisKelamin, onChange: (ev) => setFormData(p => ({ ...p, jenisKelamin: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' },
+                e('option', { value: 'Laki-laki' }, 'Laki-laki'),
+                e('option', { value: 'Perempuan' }, 'Perempuan')
+              )
+            ),
+            // Tempat Lahir
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.tempatLahir),
+              e('input', { type: 'text', value: formData.tempatLahir, onChange: (ev) => setFormData(p => ({ ...p, tempatLahir: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            ),
+            // Tanggal Lahir
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.tanggalLahir),
+              e('input', { type: 'date', value: formData.tanggalLahir, onChange: (ev) => setFormData(p => ({ ...p, tanggalLahir: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            ),
+            // Tahun Masuk
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.tahunMasuk),
+              e('input', { type: 'number', value: formData.tahunMasuk, onChange: (ev) => setFormData(p => ({ ...p, tahunMasuk: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            ),
+            // Status
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.status),
+              e('select', { value: formData.status, onChange: (ev) => setFormData(p => ({ ...p, status: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' },
+                e('option', { value: 'Lulus' }, 'Lulus'),
+                e('option', { value: 'Pindah' }, 'Pindah')
+              )
+            ),
+            // Kondisional Tahun Lulus / Alasan Pindah
+            formData.status === 'Lulus' 
+              ? e('div', { class: 'flex flex-col gap-1' },
+                  e('label', { class: 'text-xs font-bold' }, headers.tahunLulus),
+                  e('input', { type: 'number', value: formData.tahunLulus, onChange: (ev) => setFormData(p => ({ ...p, tahunLulus: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+                )
+              : e('div', { class: 'flex flex-col gap-1' },
+                  e('label', { class: 'text-xs font-bold' }, headers.alasanPindah),
+                  e('input', { type: 'text', value: formData.alasanPindah, onChange: (ev) => setFormData(p => ({ ...p, alasanPindah: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+                ),
+            // Profesi
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, headers.profesi),
+              e('input', { type: 'text', value: formData.profesi, onChange: (ev) => setFormData(p => ({ ...p, profesi: ev.target.value })), class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+            )
+          ),
+          
+          // Motto
+          e('div', { class: 'flex flex-col gap-1' },
+            e('label', { class: 'text-xs font-bold' }, headers.motto),
+            e('textarea', { value: formData.motto, onChange: (ev) => setFormData(p => ({ ...p, motto: ev.target.value })), rows: 2, class: 'px-3 py-2 text-sm rounded-lg border text-slate-900 bg-white' })
+          ),
+
+          // Upload Foto & Kamera
+          e('div', { class: 'p-4 border border-dashed rounded-xl bg-black/5 flex flex-col sm:flex-row gap-4 items-center' },
+            e('div', { class: 'w-24 h-32 bg-black/10 border rounded-lg overflow-hidden flex items-center justify-center shrink-0' },
+              photoBase64 
+                ? e('img', { src: photoBase64, class: 'w-full h-full object-cover' })
+                : isCameraActive 
+                  ? e('video', { ref: videoRef, autoPlay: true, playsInline: true, class: 'w-full h-full object-cover' })
+                  : e('span', { class: 'text-xs opacity-50' }, 'No Foto')
+            ),
+            e('div', { class: 'flex flex-wrap gap-2' },
+              !isCameraActive 
+                ? e('button', { type: 'button', onClick: startCamera, class: 'px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg' }, 'Buka Kamera')
+                : e('button', { type: 'button', onClick: capturePhoto, class: 'px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg' }, 'Ambil Gambar'),
+              e('label', { class: 'px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg cursor-pointer' }, 'Upload File',
+                e('input', { type: 'file', accept: 'image/*', onChange: handleFileChange, class: 'hidden' })
+              ),
+              (photoBase64 || isCameraActive) && e('button', { type: 'button', onClick: () => { stopCamera(); setPhotoBase64(null); setFormData(p=>({ ...p, fotoProfil:'' })); }, class: 'px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg' }, 'Reset')
+            )
+          ),
+
+          // Tombol Submit
+          e('button', { type: 'submit', disabled: isSubmitting, class: 'w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition' }, 
+            isSubmitting ? 'Mengirim Data...' : 'Kirim Biodata Alumni'
+          )
+        );
       };
 
-      const getFontClassName = () => {
-        return Array.isArray(activeFontObj.class) ? '' : activeFontObj.class;
+      // Struktur Pengaturan Admin
+      const renderAdminForm = () => {
+        return e('div', { class: 'space-y-4 mt-6' },
+          e('div', { class: 'p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl space-y-2' },
+            e('h3', { class: 'text-sm font-bold text-blue-500' }, 'Integrasi Google Sheets URL'),
+            e('input', { type: 'text', value: sheetUrl, onChange: (ev) => setSheetUrl(ev.target.value), placeholder: 'https://script.google.com/macros/s/.../exec', class: 'w-full px-3 py-2 text-xs rounded-lg border text-slate-900 bg-white' }),
+            e('button', { type: 'button', onClick: () => { localStorage.setItem('forsanu_sheet_url', sheetUrl); alert('Jalur integrasi tersimpan!'); }, class: 'px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-md' }, 'Simpan Jalur URL')
+          ),
+          e('div', { class: 'grid grid-cols-2 gap-4' },
+            e('div', { class: 'flex flex-col gap-1' },
+              e('label', { class: 'text-xs font-bold' }, 'Pilih Tema Tampilan'),
+              e('select', { value: selectedBg, onChange: (ev) => setSelectedBg(ev.target.value), class: 'px-3 py-2 text-xs rounded-lg border text-slate-900 bg-white' },
+                bgThemes.map(t => e('option', { key: t.id, value: t.id }, t.name))
+              )
+            )
+          ),
+          e('button', { type: 'button', onClick: () => setAppMode('registration'), class: 'px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-lg' }, 'Kembali ke Formulir')
+        );
       };
 
-      return (
-        <div style={getFontStyle()} className={`min-h-screen p-4 md:p-8 flex flex-col items-center justify-center transition-all duration-300 ${getFontClassName()} ${activeBgObj.class}`}>
-          <div className={`w-full max-w-3xl rounded-2xl shadow-2xl p-6 md:p-10 border transition-all ${activeBgObj.isDark ? 'bg-white/10 backdrop-blur-md border-white/10' : 'bg-white border-slate-200'}`}>
-            
-            {/* Header Menu */}
-            <div className="flex justify-between items-center mb-8 border-b pb-4 border-current/20">
-              <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl ${activeBgObj.isDark ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-800'}`}>
-                  <Award size={28} />
-                </div>
-                <div>
-                  <h1 className="text-xl md:text-2xl font-bold tracking-tight">FORSANU</h1>
-                  <p className="text-xs opacity-70">Forum Silaturahmi Alumni Santri Nuuwar</p>
-                </div>
-              </div>
-              
-              {appMode === 'registration' ? (
-                <button onClick={() => setShowPasswordModal(true)} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition ${activeBgObj.isDark ? 'bg-white/5 hover:bg-white/15' : 'bg-slate-100 hover:bg-slate-200'}`}>
-                  <Settings size={16} /> Admin
-                </button>
-              ) : (
-                <button onClick={() => setAppMode('registration')} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition">
-                  Keluar Mode Admin
-                </button>
-              )}
-            </div>
+      return e('div', { class: `min-h-screen p-4 md:p-8 flex flex-col items-center justify-center transition-all ${activeBgObj.class}` },
+        e('div', { class: `w-full max-w-2xl rounded-2xl shadow-xl p-6 md:p-8 ${activeBgObj.isDark ? 'bg-white/10 backdrop-blur-md' : 'bg-white border'}` },
+          // Header Tampilan
+          e('div', { class: 'flex justify-between items-center border-b pb-4 border-current/20' },
+            e('div', null,
+              e('h1', { class: 'text-xl font-bold tracking-tight' }, 'FORSANU'),
+              e('p', { class: 'text-xs opacity-70' }, 'Forum Silaturahmi Alumni Santri Nuuwar')
+            ),
+            appMode === 'registration' 
+              ? e('button', { onClick: () => setShowPasswordModal(true), class: 'px-3 py-1.5 bg-current/10 text-xs font-semibold rounded-lg' }, 'Admin')
+              : e('button', { onClick: () => setAppMode('registration'), class: 'px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded-lg' }, 'Keluar Admin')
+          ),
+          
+          // Form Sesuai Mode
+          appMode === 'registration' ? renderRegistrationForm() : renderAdminForm()
+        ),
 
-            {/* STATUS MESSAGE AREA */}
-            {submitStatus && (
-              <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 border ${submitStatus === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-500' : 'bg-red-500/10 border-red-500/30 text-red-500'}`}>
-                {submitStatus === 'success' ? <CheckCircle className="mt-0.5 shrink-0" /> : <AlertCircle className="mt-0.5 shrink-0" />}
-                <div>
-                  <p className="font-semibold text-sm">{statusMessage}</p>
-                  <button onClick={() => setSubmitStatus(null)} className="text-xs underline mt-1 block opacity-80 hover:opacity-100">Tutup Notifikasi</button>
-                </div>
-              </div>
-            )}
-
-            {/* ======================================================= */}
-            {/* MODE REGISTRASI UTAMA / PREVIEW ALUMNI */}
-            {/* ======================================================= */}
-            {appMode === 'registration' && (
-              <form onSubmit={handleSubmitClick} className="space-y-6">
-                <div className="text-center md:text-left mb-6">
-                  <h2 className="text-lg md:text-xl font-bold">Formulir Pendataan Biodata</h2>
-                  <p className="text-xs opacity-70">Harap isi form di bawah menggunakan data asli yang valid demi keaslian database pusat.</p>
-                </div>
-
-                {/* Grid Input Data */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Nama Lengkap */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><User size={14}/> {headers.namalengkap} <span className="text-red-500">*</span></label>
-                    <input type="text" name="namalengkap" value={formData.namalengkap} onChange={handleInputChange} placeholder="NAMA LENGKAP" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 uppercase ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                    {errors.namalengkap && <span className="text-xs text-red-500 font-medium">{errors.namalengkap}</span>}
-                  </div>
-
-                  {/* Nama Panggilan */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><User size={14}/> {headers.panggilan} <span className="text-red-500">*</span></label>
-                    <input type="text" name="panggilan" value={formData.panggilan} onChange={handleInputChange} placeholder="Nama Panggilan" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                    {errors.panggilan && <span className="text-xs text-red-500 font-medium">{errors.panggilan}</span>}
-                  </div>
-
-                  {/* Jenis Kelamin */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><User size={14}/> {headers.jenisKelamin}</label>
-                    <select name="jenisKelamin" value={formData.jenisKelamin} onChange={handleInputChange} className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
-                      <option value="Laki-laki">Laki-laki</option>
-                      <option value="Perempuan">Perempuan</option>
-                    </select>
-                  </div>
-
-                  {/* Nomor Handphone */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Phone size={14}/> {headers.noHp} <span className="text-red-500">*</span></label>
-                    <input type="text" name="noHp" value={formData.noHp} onChange={handleInputChange} placeholder="Contoh: 081234567890" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                    {errors.noHp && <span className="text-xs text-red-500 font-medium">{errors.noHp}</span>}
-                  </div>
-
-                  {/* Tempat Lahir */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><MapPin size={14}/> {headers.tempatLahir} <span className="text-red-500">*</span></label>
-                    <input type="text" name="tempatLahir" value={formData.tempatLahir} onChange={handleInputChange} placeholder="Tempat Lahir" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                    {errors.tempatLahir && <span className="text-xs text-red-500 font-medium">{errors.tempatLahir}</span>}
-                  </div>
-
-                  {/* Tanggal Lahir */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Calendar size={14}/> {headers.tanggalLahir} <span className="text-red-500">*</span></label>
-                    <input type="date" name="tanggalLahir" value={formData.tanggalLahir} onChange={handleInputChange} className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white color-scheme-dark' : 'text-slate-900'}`} />
-                    {errors.tanggalLahir && <span className="text-xs text-red-500 font-medium">{errors.tanggalLahir}</span>}
-                  </div>
-
-                  {/* Tahun Masuk */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Calendar size={14}/> {headers.tahunMasuk} <span className="text-red-500">*</span></label>
-                    <input type="number" name="tahunMasuk" min="1990" max="2100" value={formData.tahunMasuk} onChange={handleInputChange} placeholder="Contoh: 2015" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                    {errors.tahunMasuk && <span className="text-xs text-red-500 font-medium">{errors.tahunMasuk}</span>}
-                  </div>
-
-                  {/* Status Alumni */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Award size={14}/> {headers.status}</label>
-                    <select name="status" value={formData.status} onChange={handleInputChange} className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
-                      <option value="Lulus">Lulus</option>
-                      <option value="Pindah">Pindah</option>
-                    </select>
-                  </div>
-
-                  {/* Dinamis bersandarkan Status Alumni */}
-                  {formData.status === 'Lulus' ? (
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Calendar size={14}/> {headers.tahunLulus} <span className="text-red-500">*</span></label>
-                      <input type="number" name="tahunLulus" min="1990" max="2100" value={formData.tahunLulus} onChange={handleInputChange} placeholder="Tahun Kelulusan" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                      {errors.tahunLulus && <span className="text-xs text-red-500 font-medium">{errors.tahunLulus}</span>}
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><AlertCircle size={14}/> {headers.alasanPindah} <span className="text-red-500">*</span></label>
-                        <input type="text" name="alasanPindah" value={formData.alasanPindah} onChange={handleInputChange} placeholder="Alasan Mutasi/Pindah" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                        {errors.alasanPindah && <span className="text-xs text-red-500 font-medium">{errors.alasanPindah}</span>}
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Calendar size={14}/> {headers.tahunKeluarOpt}</label>
-                        <select name="tahunKeluarOpt" value={formData.tahunKeluarOpt} onChange={handleInputChange} className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
-                          <option value="Masih di pesantren">Masih di pesantren</option>
-                          <option value="Tentukan tahun">Tentukan tahun</option>
-                        </select>
-                      </div>
-
-                      {formData.tahunKeluarOpt === 'Tentukan tahun' && (
-                        <div className="flex flex-col gap-1.5">
-                          <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Calendar size={14}/> {headers.tahunKeluar} <span className="text-red-500">*</span></label>
-                          <input type="number" name="tahunKeluar" min="1990" max="2100" value={formData.tahunKeluar} onChange={handleInputChange} placeholder="Tahun Keluar" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                          {errors.tahunKeluar && <span className="text-xs text-red-500 font-medium">{errors.tahunKeluar}</span>}
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Profesi Saat Ini */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Briefcase size={14}/> {headers.profesi}</label>
-                    <select name="profesi" value={formData.profesi} onChange={handleInputChange} className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
-                      <option value="PNS">PNS</option>
-                      <option value="TNI/Polri">TNI/Polri</option>
-                      <option value="Pegawai Swasta">Pegawai Swasta</option>
-                      <option value="Wiraswasta">Wiraswasta / Bisnis</option>
-                      <option value="Guru/Dosen">Guru / Pengajar / Dosen</option>
-                      <option value="Mahasiswa">Mahasiswa / Kuliah</option>
-                      <option value="Belum Bekerja">Belum Bekerja</option>
-                      <option value="Lainnya">Lainnya (Sebutkan secara rinci)</option>
-                    </select>
-                  </div>
-
-                  {/* Input Detail Profesi Lainnya jika Memilih 'Lainnya' */}
-                  {formData.profesi === 'Lainnya' && (
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Briefcase size={14}/> {headers.profesiLainnya}</label>
-                      <input type="text" name="profesiLainnya" value={formData.profesiLainnya} onChange={handleInputChange} placeholder="Sebutkan profesi Anda secara jelas" className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                    </div>
-                  )}
-
-                  {/* Motto Hidup */}
-                  <div className="flex flex-col gap-1.5 md:col-span-2">
-                    <label className="text-xs font-semibold flex items-center gap-1.5 opacity-90"><Edit3 size={14}/> {headers.motto}</label>
-                    <textarea name="motto" value={formData.motto} onChange={handleInputChange} rows="2" placeholder="Tuliskan prinsip hidup atau kata bijak motivasi Anda..." className={`w-full px-3.5 py-2 rounded-lg text-sm bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 resize-none ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`}></textarea>
-                  </div>
-
-                  {/* KOMPONEN MEDIA FOTO PROFIL (UPLOAD & DUKUNGAN KAMERA) */}
-                  <div className="flex flex-col gap-1.5 md:col-span-2 border border-dashed border-current/20 p-5 rounded-xl bg-current/5">
-                    <label className="text-xs font-bold block mb-2 opacity-95 flex items-center gap-1.5"><Camera size={14}/> {headers.fotoProfil}</label>
-                    
-                    <div className="flex flex-col md:flex-row gap-5 items-center">
-                      {/* Kontrol Utama & Pratonton Kotak Gambar */}
-                      <div className="w-32 h-40 shrink-0 border rounded-xl overflow-hidden bg-black/10 flex items-center justify-center relative border-current/30 shadow-md">
-                        {photoBase64 ? (
-                          <img src={photoBase64} alt="Pratonton Foto Profil" className="w-full h-full object-cover" />
-                        ) : isCameraActive ? (
-                          <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover scale-x-[-1]"></video>
-                        ) : (
-                          <div className="text-center p-2 opacity-50 flex flex-col items-center gap-1">
-                            <User size={28} strokeWidth={1.5} />
-                            <span className="text-[10px] font-medium">Belum Ada Foto</span>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Barisan Tombol Operasi */}
-                      <div className="flex-1 w-full space-y-3">
-                        <div className="flex flex-wrap gap-2">
-                          {/* Logika Tombol Kamera */}
-                          {!isCameraActive ? (
-                            <button type="button" onClick={startCamera} className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 shadow-md transition">
-                              <Camera size={14}/> Ambil Foto Kamera
-                            </button>
-                          ) : (
-                            <button type="button" onClick={capturePhoto} className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 shadow-md animate-pulse">
-                              <CheckCircle size={14}/> Potret Gambar
-                            </button>
-                          )}
-
-                          {/* Tombol Unggah File Manual */}
-                          <label className={`flex items-center gap-1.5 px-3 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 shadow-md cursor-pointer transition ${isCameraActive ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <Upload size={14}/> Unggah File Foto
-                            <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" disabled={isCameraActive} />
-                          </label>
-
-                          {/* Reset Foto */}
-                          {(photoBase64 || isCameraActive) && (
-                            <button type="button" onClick={() => { stopCamera(); removePhoto(); }} className="flex items-center gap-1.5 px-3 py-2 bg-red-500 text-white rounded-lg text-xs font-semibold hover:bg-red-600 shadow-md transition">
-                              <Trash2 size={14}/> Hapus / Reset
-                            </button>
-                          )}
-                        </div>
-                        
-                        <p className="text-[11px] opacity-60 leading-relaxed">
-                          {photoName ? `Berkas terpilih: ${photoName}` : "Mendukung format gambar JPEG/PNG dengan batas file maksimum 2MB untuk menjamin kestabilan penyimpanan."}
-                        </p>
-                      </div>
-                    </div>
-                    {/* Canvas Tersembunyi untuk Capture Kamera */}
-                    <canvas ref={canvasRef} className="hidden"></canvas>
-                  </div>
-
-                </div>
-
-                {/* Tombol Kirim Form */}
-                <div className="pt-4 border-t border-current/10 flex justify-end">
-                  <button type="submit" disabled={isSubmitting} className={`w-full md:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-700 transition transform hover:-translate-y-0.5 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                    {isSubmitting ? (
-                      <>
-                        <RefreshCw size={18} className="animate-spin" /> Memproses...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle size={18} /> Kirim Biodata Alumni
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* ======================================================= */}
-            {/* MODE MODIFIKASI TAMPILAN & SETTING (KHUSUS ADMIN) */}
-            {/* ======================================================= */}
-            {appMode === 'modification' && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b pb-3 border-current/10">
-                  <div>
-                    <h2 className="text-lg font-bold flex items-center gap-2 text-emerald-500"><Shield size={20}/> Menu Modifikasi & Pengaturan Sistem</h2>
-                    <p className="text-xs opacity-70">Ubah teks label, tema visual, atau sambungkan jalur Google Apps Script di sini.</p>
-                  </div>
-                </div>
-
-                {/* Bagian Integrasi Google Sheets */}
-                <div className="p-4 rounded-xl border border-blue-500/30 bg-blue-500/5 space-y-3">
-                  <h3 className="text-sm font-bold flex items-center gap-1.5 text-blue-400"><RefreshCw size={15}/> Koneksi Google Apps Script</h3>
-                  <p className="text-xs opacity-80">Masukkan URL Web App dari Google Apps Script yang Anda buat di awal agar data alumni otomatis masuk ke Google Sheets.</p>
-                  <input type="text" value={sheetUrl} onChange={(e) => setSheetUrl(e.target.value)} placeholder="[https://script.google.com/macros/s/.../exec](https://script.google.com/macros/s/.../exec)" className={`w-full px-3.5 py-2 rounded-lg text-xs bg-current/5 border border-current/20 focus:outline-none ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                </div>
-
-                {/* Seleksi Kosmetik (Font & Background) */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5"><Type size={14}/> Pilih Gaya Font Tulisan</label>
-                    <select value={selectedFont} onChange={(e) => setSelectedFont(e.target.value)} className={`w-full px-3 py-2 rounded-lg text-xs border border-current/20 ${activeBgObj.isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
-                      {fontFamilies.map(font => (
-                        <option key={font.id} value={font.id}>{font.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold flex items-center gap-1.5"><Palette size={14}/> Pilih Tema Warna Tampilan</label>
-                    <select value={selectedBg} onChange={(e) => setSelectedBg(e.target.value)} className={`w-full px-3 py-2 rounded-lg text-xs border border-current/20 ${activeBgObj.isDark ? 'bg-slate-800 text-white' : 'bg-white text-slate-900'}`}>
-                      {bgThemes.map(theme => (
-                        <option key={theme.id} value={theme.id}>{theme.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Edit Label Judul/Header Formulir */}
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold tracking-wider uppercase opacity-80">Ubah Teks Label Kolom Input</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {Object.keys(headers).map((key) => (
-                      <div key={key} className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase font-bold opacity-60">{key}</span>
-                        <input type="text" value={headers[key]} onChange={(e) => setHeaders(prev => ({ ...prev, [key]: e.target.value }))} className={`w-full px-3 py-1.5 rounded-lg text-xs bg-current/5 border border-current/20 focus:outline-none focus:border-emerald-500 ${activeBgObj.isDark ? 'text-white' : 'text-slate-900'}`} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tombol Simpan Konfigurasi */}
-                <div className="pt-4 border-t border-current/10 flex justify-end gap-3">
-                  <button type="button" onClick={() => setAppMode('registration')} className={`px-5 py-2.5 rounded-lg text-xs font-semibold border border-current/20 hover:bg-current/5 transition`}>
-                    Batal
-                  </button>
-                  <button type="button" onClick={handleSaveHeaders} className="flex items-center gap-1.5 px-6 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-lg shadow-md hover:bg-emerald-700 transition">
-                    <Save size={14}/> Simpan Semua Konfigurasi
-                  </button>
-                </div>
-              </div>
-            )}
-
-          </div>
-
-          {/* FOOTER INFORMASI */}
-          <footer className="mt-6 text-center opacity-50 text-[11px] font-medium tracking-wide">
-            &copy; 2026 FORSANU Central Database System. All Rights Reserved.
-          </footer>
-
-          {/* ======================================================= */}
-          {/* MODAL JENDELA KONFIRMASI PRATONTON DATA SEBELUM KIRIM */}
-          {/* ======================================================= */}
-          {isPreviewOpen && (
-            <div className="fixed inset-0 z-50 p-4 bg-black/60 backdrop-blur-sm flex items-center justify-center animate-fade-in">
-              <div className="bg-white text-slate-900 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-slate-100 max-h-[90vh]">
-                <div className="bg-emerald-800 text-white px-5 py-4 flex items-center gap-2">
-                  <Eye size={20}/>
-                  <div>
-                    <h3 className="font-bold text-sm md:text-base">Pratonton Konfirmasi Data Anda</h3>
-                    <p className="text-[10px] text-emerald-200">Mohon teliti kembali data Anda sebelum disimpan permanen.</p>
-                  </div>
-                </div>
-
-                <div className="p-5 overflow-y-auto space-y-4 text-xs divide-y divide-slate-100">
-                  {/* Foto Profil di Preview */}
-                  <div className="flex justify-center pb-3">
-                    <div className="w-24 h-32 border rounded-xl overflow-hidden bg-slate-100 shadow-inner flex items-center justify-center">
-                      {photoBase64 ? <img src={photoBase64} className="w-full h-full object-cover"/> : <span className="text-[10px] text-slate-400">Tanpa Foto</span>}
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.namalengkap}</span><span className="col-span-2 font-semibold text-slate-800 break-words">{formData.namalengkap}</span></div>
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.panggilan}</span><span className="col-span-2 text-slate-800 break-words">{formData.panggilan}</span></div>
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.jenisKelamin}</span><span className="col-span-2 text-slate-800">{formData.jenisKelamin}</span></div>
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.noHp}</span><span className="col-span-2 text-slate-800 font-mono">{formData.noHp}</span></div>
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">TTL</span><span className="col-span-2 text-slate-800">{formData.tempatLahir}, {formData.tanggalLahir}</span></div>
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.tahunMasuk}</span><span className="col-span-2 text-slate-800">{formData.tahunMasuk}</span></div>
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.status}</span><span className="col-span-2 font-bold text-emerald-700">{formData.status} {formData.status === 'Lulus' ? `(${formData.tahunLulus})` : `(Keluar: ${formData.tahunKeluarOpt === 'Tentukan tahun' ? formData.tahunKeluar : 'Masih di pesantren'})`}</span></div>
-                  {formData.status === 'Pindah' && <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.alasanPindah}</span><span className="col-span-2 text-slate-800 break-words">{formData.alasanPindah}</span></div>}
-                  <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.profesi}</span><span className="col-span-2 text-slate-800">{formData.profesi === 'Lainnya' ? formData.profesiLainnya : formData.profesi}</span></div>
-                  {formData.motto.trim() && <div className="grid grid-cols-3 py-2"><span className="font-bold text-slate-500">{headers.motto}</span><span className="col-span-2 text-slate-600 italic break-words">"{formData.motto}"</span></div>}
-                </div>
-
-                <div className="bg-slate-50 px-4 py-3 flex justify-end gap-2.5 border-t border-slate-100 shrink-0">
-                  <button type="button" onClick={() => setIsPreviewOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition">Perbaiki Data</button>
-                  <button type="button" onClick={handleConfirmSubmit} className="px-5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg transition shadow-md">Ya, Kirim Data</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ======================================================= */}
-          {/* MODAL DIALOG PASSWORD VALIDASI AKSES MENU ADMIN */}
-          {/* ======================================================= */}
-          {showPasswordModal && (
-            <div className="fixed inset-0 z-50 p-4 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-              <div className="bg-white text-slate-900 w-full max-w-sm rounded-xl shadow-2xl p-5 border border-slate-100">
-                <h3 className="font-bold text-base text-slate-800 flex items-center gap-1.5 mb-1"><Lock size={18} className="text-red-500" /> Verifikasi Akses Admin</h3>
-                <p className="text-xs text-slate-500 mb-4">Halaman ini dilindungi. Masukkan password admin untuk mengubah setelan.</p>
-                
-                <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                  <div>
-                    <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} placeholder="Masukkan Password Sistem" className="w-full px-3.5 py-2 border rounded-lg text-sm bg-slate-50 focus:outline-none focus:border-emerald-600 font-mono" autoFocus />
-                    {passwordError && <p className="text-xs text-red-500 mt-1 font-medium">{passwordError}</p>}
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button type="button" onClick={() => { setShowPasswordModal(false); setPasswordInput(''); setPasswordError(''); }} className="px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition">Batal</button>
-                    <button type="submit" className="px-4 py-1.5 text-xs font-bold bg-slate-900 text-white hover:bg-black rounded-lg transition shadow-md">Verifikasi</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-        </div>
+        // Jendela Popup Password Admin
+        showPasswordModal && e('div', { class: 'fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50' },
+          e('div', { class: 'bg-white text-slate-900 p-5 rounded-xl w-full max-w-sm space-y-3 shadow-2xl' },
+            e('h3', { class: 'font-bold text-sm' }, 'Verifikasi Akses Admin'),
+            e('input', { type: 'password', placeholder: 'Masukkan Password Admin', value: passwordInput, onChange: (ev) => setPasswordInput(ev.target.value), class: 'w-full px-3 py-2 text-sm border rounded-lg bg-slate-50' }),
+            passwordError && e('p', { class: 'text-xs text-red-500 font-medium' }, passwordError),
+            e('div', { class: 'flex justify-end gap-2' },
+              e('button', { type: 'button', onClick: () => { setShowPasswordModal(false); setPasswordInput(''); setPasswordError(''); }, class: 'px-3 py-1.5 text-xs text-slate-600' }, 'Batal'),
+              e('button', { type: 'button', onClick: () => {
+                if (passwordInput === 'owner01') {
+                  setAppMode('modification');
+                  setShowPasswordModal(false);
+                  setPasswordInput('');
+                  setPasswordError('');
+                } else {
+                  setPasswordError('Password salah!');
+                }
+              }, class: 'px-4 py-1.5 bg-slate-900 text-white text-xs font-bold rounded-lg' }, 'Verifikasi')
+            )
+          )
+        )
       );
     }
 
-    // Merender aplikasi ke layar browser alumni
+    // Render ke halaman
     const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    root.render(e(App));
   </script>
 </body>
 </html>
