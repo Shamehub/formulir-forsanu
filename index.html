@@ -1,1 +1,1547 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulir FORSANU</title>
+    <!-- Di sini adalah tempat script pendukung seperti Tailwind/React jika diperlukan -->
+</head>
+<body>
+    import React, { useState, useEffect, useRef } from 'react'
+import { 
+  User, Phone, Calendar, MapPin, Briefcase, Award, Camera, 
+  Upload, CheckCircle, Eye, Edit3, Settings, Lock, RefreshCw, 
+  ChevronDown, AlertCircle, Trash2, Shield, Save, Palette, Type, Sun, Moon, Copy
+} from 'lucide-react';
 
+export default function App() {
+  // App Modes: 'registration' | 'modification'
+  const [appMode, setAppMode] = useState('registration');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  // 10 Premium Font Families Config
+  const fontFamilies = [
+    { id: 'font-inter', name: 'Inter (Bersih & Modern)', class: 'font-sans' },
+    { id: 'font-serif', name: 'Playfair Display (Serif Klasik Elegan)', class: 'font-serif' },
+    { id: 'font-mono', name: 'Roboto Mono (Minimalis & Rapi)', class: 'font-mono' },
+    { id: 'font-poppins', name: 'Poppins (Geometris & Dinamis)', class: '[font-family:Poppins,sans-serif]' },
+    { id: 'font-montserrat', name: 'Montserrat (Tegas & Mewah)', class: '[font-family:Montserrat,sans-serif]' },
+    { id: 'font-lora', name: 'Lora (Serif Hangat & Akademis)', class: '[font-family:Lora,serif]' },
+    { id: 'font-merriweather', name: 'Merriweather (Sastra Editorial)', class: '[font-family:Merriweather,serif]' },
+    { id: 'font-work', name: 'Work Sans (Sangat Terbaca)', class: '[font-family:"Work_Sans",sans-serif]' },
+    { id: 'font-cabin', name: 'Cabin (Halus & Kontemporer)', class: '[font-family:Cabin,sans-serif]' },
+    { id: 'font-cinzel', name: 'Cinzel (Monumental Kerajaan)', class: '[font-family:Cinzel,serif]' }
+  ];
+
+  // Background Theme Presets (Variasi Cerah & Gelap)
+  const bgThemes = [
+    // DARK THEMES (Gelap Elegan)
+    { id: 'dark-medium-emerald', name: 'Medium Dark Emerald (Default)', class: 'bg-[#0d3c2f] text-emerald-50', isDark: true },
+    { id: 'dark-royal-green', name: 'Royal Forest Deep', class: 'bg-[#06241b] text-slate-100', isDark: true },
+    { id: 'dark-velvet-gold', name: 'Gradasi Emerald-Emas Gelap', class: 'bg-gradient-to-tr from-[#051f16] via-[#0b3c2e] to-[#154c3c] text-emerald-100', isDark: true },
+    { id: 'dark-obsidian', name: 'Midnight Obsidian Black', class: 'bg-[#090d16] text-slate-100', isDark: true },
+    
+    // LIGHT THEMES (Cerah Bersih)
+    { id: 'light-pure-white', name: 'Cerah Pure White', class: 'bg-white text-slate-800', isDark: false },
+    { id: 'light-soft-cream', name: 'Cerah Premium Cream', class: 'bg-[#faf6ed] text-slate-955', isDark: false },
+    { id: 'light-mint-gradient', name: 'Gradasi Clean Mint-Mist', class: 'bg-gradient-to-tr from-emerald-50 via-slate-50 to-amber-50 text-slate-800', isDark: false },
+    { id: 'light-warm-aura', name: 'Gradasi Warm Amber Light', class: 'bg-gradient-to-br from-amber-50/55 via-white to-emerald-50/40 text-slate-900', isDark: false }
+  ];
+
+  // Active Theme Customizations (Stored in state and saved in localStorage)
+  const [selectedFont, setSelectedFont] = useState('font-inter');
+  const [selectedBg, setSelectedBg] = useState('dark-medium-emerald'); // Set default to the new medium dark green
+
+  // Form Headers (Editable in Modification Mode)
+  const [headers, setHeaders] = useState({
+    tipeData: "Tipe Data",
+    namaLengkap: "Nama Lengkap",
+    panggilan: "Nama Panggilan",
+    jenisKelamin: "Jenis Kelamin",
+    tempatLahir: "Tempat Lahir",
+    tanggalLahir: "Tanggal Lahir",
+    noHp: "Nomor Handphone WA (+62)",
+    tahunMasuk: "Tahun Masuk",
+    status: "Status Alumni",
+    tahunLulus: "Tahun Lulus",
+    alasanPindah: "Alasan Pindah",
+    tahunKeluarOpt: "Opsi Tahun Keluar",
+    tahunKeluar: "Tahun Keluar",
+    profesi: "Profesi / Pekerjaan Saat Ini",
+    profesiLainnya: "Detail Profesi Lainnya",
+    motto: "Motto / Prinsip Hidup",
+    fotoProfil: "Foto Profil Alumni"
+  });
+
+  // Form State
+  const [formData, setFormData] = useState({
+    tipeData: 'Data Baru',
+    namaLengkap: '',
+    panggilan: '',
+    jenisKelamin: 'Laki-laki',
+    tempatLahir: '',
+    tanggalLahir: '',
+    noHp: '',
+    tahunMasuk: '',
+    status: 'Lulus',
+    tahunLulus: '',
+    alasanPindah: '',
+    tahunKeluarOpt: 'Masih di pesantren',
+    tahunKeluar: '',
+    profesi: 'PNS',
+    profesiLainnya: '',
+    motto: ''
+  });
+
+  // Photo Upload State
+  const [photoBase64, setPhotoBase64] = useState(null);
+  const [photoName, setPhotoName] = useState('');
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  // UI States
+  const [errors, setErrors] = useState({});
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' | 'error' | null
+  const [statusMessage, setStatusMessage] = useState('');
+  const [sheetUrl, setSheetUrl] = useState(''); // Input for Google Apps Script URL
+  const [isCopied, setIsCopied] = useState(false);
+
+  // Load configuration from localStorage on mount
+  useEffect(() => {
+    const savedHeaders = localStorage.getItem('forsanu_headers');
+    if (savedHeaders) {
+      setHeaders(JSON.parse(savedHeaders));
+    }
+    const savedSheetUrl = localStorage.getItem('forsanu_sheet_url');
+    if (savedSheetUrl) {
+      setSheetUrl(savedSheetUrl);
+    }
+    const savedFont = localStorage.getItem('forsanu_active_font');
+    if (savedFont) {
+      setSelectedFont(savedFont);
+    }
+    const savedBg = localStorage.getItem('forsanu_active_bg');
+    if (savedBg) {
+      setSelectedBg(savedBg);
+    }
+  }, []);
+
+  // Save headers and styling configuration
+  const handleSaveHeaders = () => {
+    localStorage.setItem('forsanu_headers', JSON.stringify(headers));
+    localStorage.setItem('forsanu_sheet_url', sheetUrl);
+    localStorage.setItem('forsanu_active_font', selectedFont);
+    localStorage.setItem('forsanu_active_bg', selectedBg);
+    alert('Seluruh konfigurasi tampilan, tema, dan integrasi berhasil disimpan!');
+    setAppMode('registration');
+  };
+
+  // Text formatting helpers
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    let formattedValue = value;
+
+    if (name === 'namaLengkap') {
+      formattedValue = value.toUpperCase();
+    } else if (['panggilan', 'tempatLahir', 'profesiLainnya', 'motto', 'alasanPindah'].includes(name)) {
+      formattedValue = toTitleCase(value);
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }));
+
+    // Clear validation error when user types
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
+    }
+  };
+
+  // Camera handling logic
+  const startCamera = async () => {
+    setIsCameraActive(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Gagal mengakses kamera: ", err);
+      alert("Tidak dapat mengakses kamera. Pastikan Anda memberikan izin akses kamera.");
+      setIsCameraActive(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+    }
+    setIsCameraActive(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      setPhotoBase64(dataUrl);
+      setPhotoName(`foto_kamera_${Date.now()}.jpg`);
+      stopCamera();
+    }
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Ukuran berkas maksimal adalah 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoBase64(reader.result);
+        setPhotoName(file.name);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Validation
+  const validateForm = () => {
+    const newErrors = {};
+    const isUpdate = formData.tipeData === 'Update Data';
+
+    if (!formData.namaLengkap.trim()) newErrors.namaLengkap = "Nama Lengkap wajib diisi";
+    if (!formData.tempatLahir.trim()) newErrors.tempatLahir = "Tempat Lahir wajib diisi";
+    if (!formData.tanggalLahir) newErrors.tanggalLahir = "Tanggal Lahir wajib diisi";
+
+    if (!isUpdate) {
+      if (!formData.panggilan.trim()) newErrors.panggilan = "Nama Panggilan wajib diisi";
+      if (!formData.noHp.trim()) newErrors.noHp = "Nomor Handphone wajib diisi";
+      if (!formData.tahunMasuk) newErrors.tahunMasuk = "Tahun Masuk wajib diisi";
+      if (formData.status === 'Lulus' && !formData.tahunLulus) newErrors.tahunLulus = "Tahun Lulus wajib diisi";
+      if (formData.status === 'Pindah' && !formData.alasanPindah.trim()) newErrors.alasanPindah = "Alasan Pindah wajib diisi";
+      if (formData.tahunKeluarOpt === 'Input Tahun' && !formData.tahunKeluar) newErrors.tahunKeluar = "Tahun Keluar wajib diisi";
+      if (formData.profesi === 'Lainnya' && !formData.profesiLainnya.trim()) newErrors.profesiLainnya = "Silakan sebutkan profesi Anda";
+      if (!photoBase64) newErrors.fotoProfil = "Foto Profil wajib diunggah untuk pendataan baru";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleOpenPreview = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      setIsPreviewOpen(true);
+    } else {
+      const firstErrorEl = document.querySelector('.text-rose-500');
+      if (firstErrorEl) {
+        firstErrorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
+  // Google Apps Script Code String to be displayed and copied
+  const googleAppsScriptCode = `function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    
+    // 1. Kelola folder foto di Google Drive ("Upload Foto Alumni")
+    var folderName = "Upload Foto Alumni";
+    var folders = DriveApp.getFoldersByName(folderName);
+    var folder;
+    if (folders.hasNext()) {
+      folder = folders.next();
+    } else {
+      folder = DriveApp.createFolder(folderName);
+    }
+    
+    // 2. Simpan file foto profil jika dilampirkan
+    var fileUrl = "";
+    if (data["Foto Profil Base64"] && data["Nama File Foto"]) {
+      var rawData = data["Foto Profil Base64"].split(",")[1];
+      var blob = Utilities.newBlob(Utilities.base64Decode(rawData), "image/jpeg", data["Nama File Foto"]);
+      var file = folder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      fileUrl = file.getUrl();
+    }
+    
+    // 3. Susun header dinamis (mengecualikan raw base64 data foto)
+    var payloadHeaders = Object.keys(data).filter(function(k) {
+      return k !== "Foto Profil Base64" && k !== "Nama File Foto";
+    });
+    payloadHeaders.push("Link Foto Profil");
+    
+    // Tulis baris pertama (Header) jika spreadsheet dalam keadaan kosong
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(payloadHeaders);
+    }
+    
+    // Ambil daftar header aktual dari baris ke-1 di spreadsheet
+    var sheetHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    
+    // Petakan value ke baris baru sesuai letak header di spreadsheet
+    var rowData = sheetHeaders.map(function(h) {
+      if (h === "Link Foto Profil") return fileUrl;
+      return data[h] !== undefined ? data[h] : "";
+    });
+    
+    sheet.appendRow(rowData);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "success", 
+      message: "Data berhasil disimpan ke Google Sheets & Drive!",
+      fileUrl: fileUrl
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error", 
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}`;
+
+  const handleCopyCode = () => {
+    // Standard secure copy to clipboard API
+    const el = document.createElement('textarea');
+    el.value = googleAppsScriptCode;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2500);
+  };
+
+  // Submit flow
+  const handleSubmitData = async () => {
+    setIsPreviewOpen(false);
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    setStatusMessage("Sedang mensinkronisasi data ke Google Spreadsheet...");
+
+    const scriptUrl = sheetUrl || "https://script.google.com/macros/s/AKfycbz_MOCK_URL_HERE/exec"; 
+
+    const payload = {
+      [headers.tipeData]: formData.tipeData,
+      [headers.namaLengkap]: formData.namaLengkap,
+      [headers.panggilan]: formData.panggilan || '-',
+      [headers.jenisKelamin]: formData.jenisKelamin,
+      [headers.tempatLahir]: formData.tempatLahir,
+      [headers.tanggalLahir]: formData.tanggalLahir,
+      [headers.noHp]: formData.noHp ? `+62 ${formData.noHp}` : '-',
+      [headers.tahunMasuk]: formData.tahunMasuk || '-',
+      [headers.status]: formData.status || '-',
+      [headers.tahunLulus]: formData.status === 'Lulus' ? formData.tahunLulus : '-',
+      [headers.alasanPindah]: formData.status === 'Pindah' ? formData.alasanPindah : '-',
+      [headers.tahunKeluar]: formData.tahunKeluarOpt === 'Input Tahun' ? formData.tahunKeluar : formData.tahunKeluarOpt,
+      [headers.profesi]: formData.profesi === 'Lainnya' ? formData.profesiLainnya : formData.profesi,
+      [headers.motto]: formData.motto || '-',
+      "Foto Profil Base64": photoBase64 || '',
+      "Nama File Foto": photoName || ''
+    };
+
+    try {
+      await fetch(scriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      setSubmitStatus('success');
+      setStatusMessage("Selamat! Data berhasil disimpan di Google Spreadsheet & Berkas foto Anda otomatis tersimpan di Google Drive dalam folder 'Upload Foto Alumni'.");
+      
+      // Reset form
+      setFormData({
+        tipeData: 'Data Baru',
+        namaLengkap: '',
+        panggilan: '',
+        jenisKelamin: 'Laki-laki',
+        tempatLahir: '',
+        tanggalLahir: '',
+        noHp: '',
+        tahunMasuk: '',
+        status: 'Lulus',
+        tahunLulus: '',
+        alasanPindah: '',
+        tahunKeluarOpt: 'Masih di pesantren',
+        tahunKeluar: '',
+        profesi: 'PNS',
+        profesiLainnya: '',
+        motto: ''
+      });
+      setPhotoBase64(null);
+      setPhotoName('');
+    } catch (error) {
+      console.error("Submission Error:", error);
+      setSubmitStatus('error');
+      setStatusMessage("Gagal mengirim data. Silakan periksa kembali tautan integrasi Google Apps Script Anda.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCheckPassword = () => {
+    if (passwordInput === 'owner01') {
+      setAppMode('modification');
+      setShowPasswordModal(false);
+      setPasswordError('');
+    } else {
+      setPasswordError('Sandi salah! Gunakan sandi "owner01" untuk hak akses modifikasi.');
+    }
+  };
+
+  // Determine theme properties
+  const activeFontClass = fontFamilies.find(f => f.id === selectedFont)?.class || 'font-sans';
+  const activeTheme = bgThemes.find(b => b.id === selectedBg) || bgThemes[0];
+  const activeBgClass = activeTheme.class;
+  const isDark = activeTheme.isDark;
+
+  // Adaptive Styles based on Selected Theme (Dark vs Light)
+  const cardClass = isDark 
+    ? 'bg-emerald-950/40 border border-emerald-800/40 text-slate-100 shadow-xl backdrop-blur-sm'
+    : 'bg-white border border-slate-100 text-slate-800 shadow-md';
+
+  const inputClass = isDark
+    ? 'bg-[#06241b] border-emerald-800/60 focus:border-amber-400 focus:ring-1 focus:ring-amber-400 text-slate-100'
+    : 'bg-slate-50 border-slate-250 focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 text-slate-800';
+
+  const labelClass = isDark 
+    ? 'text-emerald-300' 
+    : 'text-slate-600';
+
+  const titleClass = isDark 
+    ? 'text-slate-100' 
+    : 'text-slate-800';
+
+  const subTitleClass = isDark 
+    ? 'text-slate-400' 
+    : 'text-slate-500';
+
+  return (
+    <div className={`min-h-screen pb-20 transition-all duration-500 ${activeFontClass} ${activeBgClass}`}>
+      
+      {/* Decorative premium light glows (looks great on both dark/light background) */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[380px] bg-gradient-to-b from-emerald-500/10 via-amber-400/5 to-transparent blur-3xl pointer-events-none -z-10" />
+
+      {/* Header Bar */}
+      <header className={`sticky top-0 z-30 backdrop-blur-md border-b px-4 py-3 shadow-xs ${
+        isDark ? 'bg-[#0d3c2f]/80 border-emerald-900/60' : 'bg-white/70 border-emerald-100/80'
+      }`}>
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+            <span className={`text-xs font-bold tracking-wider uppercase ${isDark ? 'text-amber-300' : 'text-emerald-800'}`}>
+              Portal Pendataan FORSANU
+            </span>
+          </div>
+          
+          <button 
+            onClick={() => {
+              if (appMode === 'registration') {
+                setPasswordInput('');
+                setPasswordError('');
+                setShowPasswordModal(true);
+              } else {
+                setAppMode('registration');
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ${
+              isDark 
+                ? 'border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20' 
+                : 'border border-emerald-200/80 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/50'
+            }`}
+          >
+            {appMode === 'registration' ? (
+              <>
+                <Settings size={14} className={isDark ? 'text-amber-300' : 'text-emerald-750'} />
+                <span>Mode Modifikasi</span>
+              </>
+            ) : (
+              <>
+                <Shield size={14} className="text-amber-500" />
+                <span>Kembali Ke Registrasi</span>
+              </>
+            )}
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-3xl mx-auto px-4 pt-8">
+        
+        {/* Brand Hero Card */}
+        <div className={`relative overflow-hidden rounded-3xl border text-center p-8 md:p-12 shadow-xl mb-8 ${
+          isDark ? 'bg-gradient-to-b from-emerald-950/80 to-[#0c3529]/90 border-emerald-800/40' : 'bg-white border-slate-100'
+        }`}>
+          <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]" />
+          
+          {/* Logo / Emblems */}
+          <div className="relative mx-auto w-24 h-24 mb-6 rounded-full bg-white border-2 border-amber-400 p-2 flex items-center justify-center shadow-md">
+            <svg viewBox="0 0 100 100" className="w-full h-full text-emerald-700 fill-current">
+              <path d="M50 5 L90 28 L90 72 L50 95 L10 72 L10 28 Z" fill="none" stroke="#d97706" strokeWidth="2.5"/>
+              <path d="M50 15 L80 32 L80 68 L50 85 L20 68 L20 32 Z" className="opacity-15" fill="currentColor"/>
+              <text x="50" y="55" textAnchor="middle" fill="#d97706" className="font-extrabold text-2xl tracking-tighter">NU</text>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#047857" strokeWidth="1" strokeDasharray="4 4"/>
+            </svg>
+            <div className="absolute -bottom-2 bg-gradient-to-r from-emerald-700 to-emerald-800 text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">
+              Cempaka
+            </div>
+          </div>
+
+          <h1 className={`text-2xl md:text-4xl font-extrabold tracking-tight ${isDark ? 'bg-gradient-to-r from-amber-200 via-amber-400 to-emerald-300 bg-clip-text text-transparent' : 'text-slate-900'}`}>
+            {headers.tipeData === "Tipe Data" ? "Formulir Pendataan FORSANU" : `Formulir ${headers.namaLengkap}`}
+          </h1>
+          <p className={`text-xs md:text-sm font-semibold tracking-widest uppercase mt-2 ${isDark ? 'text-emerald-300' : 'text-emerald-800'}`}>
+            (Forum Silaturahmi Alumni NU Cempaka)
+          </p>
+          
+          <div className="w-16 h-0.5 bg-gradient-to-r from-amber-400 to-emerald-600 mx-auto my-4 rounded-full" />
+          
+          <p className={`italic text-sm font-serif ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>
+            "Berakhlak Sufi, Bermental Pejuang"
+          </p>
+
+          {appMode === 'modification' && (
+            <div className="absolute top-4 right-4 bg-amber-100/90 text-amber-900 border border-amber-300 text-[10px] uppercase font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+              <Edit3 size={12} className="text-amber-750" />
+              <span>Modifikasi Header Aktif</span>
+            </div>
+          )}
+        </div>
+
+        {/* --- PANEL CONFIGURATION (Mode Modifikasi Only) --- */}
+        {appMode === 'modification' && (
+          <div className="mb-8 rounded-2xl border border-amber-300 bg-white p-6 shadow-lg space-y-6 text-slate-800 animate-fade-in">
+            <h3 className="text-slate-900 font-extrabold flex items-center gap-2 text-sm uppercase tracking-wider border-b pb-3">
+              <Palette className="text-amber-600" size={18} /> PANEL CONFIGURATION (TEMA, FONT & INTEGRASI)
+            </h3>
+
+            {/* 1. Pemilihan Font Premium (10 Pilihan) */}
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                <Type size={14} className="text-emerald-700" /> 1. Pilih Kombinasi Font Aplikasi
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {fontFamilies.map((font) => (
+                  <button
+                    key={font.id}
+                    type="button"
+                    onClick={() => setSelectedFont(font.id)}
+                    className={`flex items-center justify-between p-3 rounded-xl border text-left text-xs transition-all ${
+                      selectedFont === font.id 
+                        ? 'border-emerald-600 bg-emerald-55/40 text-emerald-955 font-bold shadow-xs' 
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className={font.class}>{font.name}</span>
+                    {selectedFont === font.id && <span className="w-2 h-2 rounded-full bg-emerald-600" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Pemilihan Background (Varian Cerah & Gelap) */}
+            <div>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5 mb-2">
+                <Palette size={14} className="text-emerald-700" /> 2. Pilih Warna Latar Belakang (Cerah & Gelap)
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Dark Background Category */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <Moon size={10} /> PILIHAN TEMA GELAP (DARK)
+                  </span>
+                  {bgThemes.filter(theme => theme.isDark).map((bg) => (
+                    <button
+                      key={bg.id}
+                      type="button"
+                      onClick={() => setSelectedBg(bg.id)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-xs transition-all ${
+                        selectedBg === bg.id 
+                          ? 'border-amber-500 bg-amber-50 text-slate-900 font-bold' 
+                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>{bg.name}</span>
+                      <span className={`w-5 h-5 rounded border border-slate-350 shadow-xs ${bg.class.split(' ')[0]}`} />
+                    </button>
+                  ))}
+                </div>
+
+                {/* Light Background Category */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <Sun size={10} /> PILIHAN TEMA CERAH (LIGHT)
+                  </span>
+                  {bgThemes.filter(theme => !theme.isDark).map((bg) => (
+                    <button
+                      key={bg.id}
+                      type="button"
+                      onClick={() => setSelectedBg(bg.id)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-lg border text-left text-xs transition-all ${
+                        selectedBg === bg.id 
+                          ? 'border-emerald-600 bg-emerald-50 text-slate-900 font-bold' 
+                          : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>{bg.name}</span>
+                      <span className={`w-5 h-5 rounded border border-slate-300 shadow-xs ${bg.class.split(' ')[0]}`} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Panel Spreadsheet Integration & Google Apps Script Source Code */}
+            <div className="pt-4 border-t border-slate-100 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  3. Google Apps Script Web App URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://script.google.com/macros/s/.../exec"
+                  value={sheetUrl}
+                  onChange={(e) => setSheetUrl(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-700 focus:border-emerald-500 outline-none transition-all"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Masukkan Web App URL yang telah di-deploy dari editor Google Apps Script Anda.
+                </p>
+              </div>
+
+              {/* Goolge Apps Script Code Embed Area */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-emerald-800 uppercase tracking-wider block">
+                    4. Salin Kode Google Apps Script (.gs)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleCopyCode}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-full text-[10px] font-bold transition-all"
+                  >
+                    <Copy size={12} />
+                    <span>{isCopied ? 'Berhasil Disalin!' : 'Salin Kode'}</span>
+                  </button>
+                </div>
+                
+                <div className="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-800 shadow-inner">
+                  <div className="flex justify-between items-center text-[9px] text-slate-400 uppercase tracking-widest border-b border-slate-800 pb-2 mb-2 font-mono">
+                    <span>Google_Apps_Script_Code.gs</span>
+                    <span>JavaScript (GAS)</span>
+                  </div>
+                  <pre className="text-[11px] font-mono leading-relaxed overflow-x-auto max-h-60 scrollbar-thin text-emerald-400">
+                    {googleAppsScriptCode}
+                  </pre>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-slate-700 text-xs space-y-1.5">
+                  <span className="font-bold text-amber-905 block">💡 Cara Pemasangan di Google Apps Script:</span>
+                  <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-600 leading-relaxed">
+                    <li>Buka <a href="https://sheet.new" target="_blank" className="underline text-emerald-700 font-semibold">Google Sheets Baru</a> atau Spreadsheet Anda yang sudah ada.</li>
+                    <li>Pada menu atas, pilih <strong>Extensions / Ekstensi</strong> &gt; <strong>Apps Script</strong>.</li>
+                    <li>Hapus semua baris kode default di dalam editor (jika ada), lalu tempelkan (paste) kode di atas.</li>
+                    <li>Klik tombol simpan (ikon disket), lalu klik <strong>Deploy</strong> &gt; <strong>New Deployment</strong>.</li>
+                    <li>Pilih jenis deployment: <strong>Web App</strong>.</li>
+                    <li>Ubah konfigurasi akses: <strong>Execute as: "Me"</strong> dan <strong>Who has access: "Anyone"</strong> (Sangat penting agar pendaftar dapat mengirim data).</li>
+                    <li>Klik <strong>Deploy</strong>, izinkan akses akun Google Anda, lalu salin <strong>Web App URL</strong> yang dihasilkan ke kolom input di atas.</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dynamic Status Banner */}
+        {submitStatus === 'success' && (
+          <div className="mb-8 p-6 rounded-2xl border border-emerald-55/30 bg-white text-center shadow-lg animate-fade-in text-slate-805">
+            <CheckCircle className="mx-auto text-emerald-600 mb-2 animate-bounce" size={40} />
+            <h4 className="text-emerald-850 font-bold mb-1">Registrasi Anda Telah Berhasil Terkirim</h4>
+            <p className="text-slate-600 text-xs">{statusMessage}</p>
+            <button 
+              onClick={() => setSubmitStatus(null)}
+              className="mt-4 px-5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-full text-xs font-semibold transition-all shadow-sm"
+            >
+              Isi Ulang Formulir
+            </button>
+          </div>
+        )}
+
+        {submitStatus === 'error' && (
+          <div className="mb-8 p-6 rounded-2xl border border-rose-200 bg-white text-center shadow-lg animate-fade-in text-slate-805">
+            <AlertCircle className="mx-auto text-rose-500 mb-2" size={40} />
+            <h4 className="text-rose-700 font-bold mb-1">Gagal Mengirim Data</h4>
+            <p className="text-slate-600 text-xs">{statusMessage}</p>
+            <button 
+              onClick={() => setSubmitStatus(null)}
+              className="mt-4 px-5 py-2 bg-rose-600 text-white rounded-full text-xs font-semibold hover:bg-rose-500 transition-all shadow-sm"
+            >
+              Coba Kirim Ulang
+            </button>
+          </div>
+        )}
+
+        {/* MAIN FORM */}
+        <form onSubmit={handleOpenPreview} className="space-y-6">
+          
+          {/* Section 1: Tipe Pendataan (Dropdown Mode) */}
+          <div className={`rounded-2xl p-6 ${cardClass}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <Shield size={20} />
+              </div>
+              <div>
+                <h2 className={`text-sm font-bold uppercase tracking-wider ${titleClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.tipeData} 
+                      onChange={(e) => setHeaders({...headers, tipeData: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-350 px-2 py-0.5 rounded outline-none text-xs"
+                    />
+                  ) : headers.tipeData} <span className="text-rose-500">*</span>
+                </h2>
+                <p className={`text-xs ${subTitleClass}`}>Pilih tipe pelaporan pendataan Anda</p>
+              </div>
+            </div>
+
+            <div className="relative">
+              <select
+                name="tipeData"
+                value={formData.tipeData}
+                onChange={handleInputChange}
+                className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass}`}
+              >
+                <option value="Data Baru">Data Baru (Semua Kolom Wajib Diisi)</option>
+                <option value="Update Data">Update Data (Hanya Nama, Tempat Lahir, & Tanggal Lahir yang Wajib)</option>
+              </select>
+              <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+            </div>
+          </div>
+
+          {/* Section 2: Identitas Diri */}
+          <div className={`rounded-2xl p-6 ${cardClass}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <User size={20} />
+              </div>
+              <div>
+                <h2 className={`text-sm font-bold uppercase tracking-wider ${titleClass}`}>Informasi Identitas Diri</h2>
+                <p className={`text-xs ${subTitleClass}`}>Isi data pribadi secara seksama dan teliti</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Nama Lengkap */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.namaLengkap} 
+                      onChange={(e) => setHeaders({...headers, namaLengkap: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.namaLengkap} <span className="text-rose-500">* (Nama otomatis UPPERCASE)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="namaLengkap"
+                    value={formData.namaLengkap}
+                    onChange={handleInputChange}
+                    placeholder="CONTOH: AHMAD MAULANA SHIDDIQ"
+                    className={`w-full border rounded-xl pl-4 pr-10 py-3 text-sm outline-none transition-all uppercase ${inputClass} ${
+                      errors.namaLengkap ? 'border-rose-500' : ''
+                    }`}
+                  />
+                  <div className="absolute inset-y-0 right-3 flex items-center text-slate-400">
+                    <User size={16} />
+                  </div>
+                </div>
+                {errors.namaLengkap && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.namaLengkap}</p>}
+              </div>
+
+              {/* Nama Panggilan */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.panggilan} 
+                      onChange={(e) => setHeaders({...headers, panggilan: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.panggilan} {formData.tipeData === 'Data Baru' && <span className="text-rose-500">* (Title Case)</span>}
+                </label>
+                <input
+                  type="text"
+                  name="panggilan"
+                  value={formData.panggilan}
+                  onChange={handleInputChange}
+                  placeholder="Contoh: Ahmad"
+                  className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all ${inputClass} ${
+                    errors.panggilan ? 'border-rose-500' : ''
+                  }`}
+                />
+                {errors.panggilan && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.panggilan}</p>}
+              </div>
+
+              {/* Jenis Kelamin (Dropdown Mode) */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.jenisKelamin} 
+                      onChange={(e) => setHeaders({...headers, jenisKelamin: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.jenisKelamin} <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    name="jenisKelamin"
+                    value={formData.jenisKelamin}
+                    onChange={handleInputChange}
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass}`}
+                  >
+                    <option value="Laki-laki">Laki-laki</option>
+                    <option value="Perempuan">Perempuan</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                </div>
+              </div>
+
+              {/* Tempat & Tanggal Lahir */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                    {appMode === 'modification' ? (
+                      <input 
+                        type="text" 
+                        value={headers.tempatLahir} 
+                        onChange={(e) => setHeaders({...headers, tempatLahir: e.target.value})}
+                        className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                      />
+                    ) : headers.tempatLahir} <span className="text-rose-500">* (Title Case)</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="tempatLahir"
+                      value={formData.tempatLahir}
+                      onChange={handleInputChange}
+                      placeholder="Contoh: Jakarta Selatan"
+                      className={`w-full border rounded-xl pl-4 pr-10 py-3 text-sm outline-none transition-all ${inputClass} ${
+                        errors.tempatLahir ? 'border-rose-500' : ''
+                      }`}
+                    />
+                    <div className="absolute inset-y-0 right-3 flex items-center text-slate-400">
+                      <MapPin size={16} />
+                    </div>
+                  </div>
+                  {errors.tempatLahir && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.tempatLahir}</p>}
+                </div>
+
+                <div>
+                  <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                    {appMode === 'modification' ? (
+                      <input 
+                        type="text" 
+                        value={headers.tanggalLahir} 
+                        onChange={(e) => setHeaders({...headers, tanggalLahir: e.target.value})}
+                        className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                      />
+                    ) : headers.tanggalLahir} <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    name="tanggalLahir"
+                    value={formData.tanggalLahir}
+                    onChange={handleInputChange}
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all ${inputClass} ${
+                      errors.tanggalLahir ? 'border-rose-500' : ''
+                    } ${isDark ? '[color-scheme:dark]' : ''}`}
+                  />
+                  {errors.tanggalLahir && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.tanggalLahir}</p>}
+                </div>
+              </div>
+
+              {/* No. Handphone */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.noHp} 
+                      onChange={(e) => setHeaders({...headers, noHp: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.noHp} {formData.tipeData === 'Data Baru' && <span className="text-rose-500">*</span>}
+                </label>
+                <div className="flex">
+                  <span className={`inline-flex items-center px-4 rounded-l-xl border border-r-0 text-sm font-semibold ${
+                    isDark ? 'bg-emerald-950 border-emerald-800/60 text-emerald-300' : 'bg-slate-100 border-slate-250 text-slate-550'
+                  }`}>
+                    +62
+                  </span>
+                  <input
+                    type="tel"
+                    name="noHp"
+                    value={formData.noHp}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setFormData(prev => ({ ...prev, noHp: value }));
+                    }}
+                    placeholder="8123456789"
+                    className={`w-full border rounded-r-xl px-4 py-3 text-sm outline-none transition-all ${inputClass} ${
+                      errors.noHp ? 'border-rose-500' : ''
+                    }`}
+                  />
+                </div>
+                {errors.noHp && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.noHp}</p>}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Data Kepesantrenan */}
+          <div className={`rounded-2xl p-6 ${cardClass}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <Award size={20} />
+              </div>
+              <div>
+                <h2 className={`text-sm font-bold uppercase tracking-wider ${titleClass}`}>Riwayat & Status Kepesantrenan</h2>
+                <p className={`text-xs ${subTitleClass}`}>Riwayat pengabdian & belajar di Pondok Pesantren</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Tahun Masuk */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.tahunMasuk} 
+                      onChange={(e) => setHeaders({...headers, tahunMasuk: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.tahunMasuk} {formData.tipeData === 'Data Baru' && <span className="text-rose-500">*</span>}
+                </label>
+                <div className="relative">
+                  <select
+                    name="tahunMasuk"
+                    value={formData.tahunMasuk}
+                    onChange={handleInputChange}
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass} ${
+                      errors.tahunMasuk ? 'border-rose-500' : ''
+                    }`}
+                  >
+                    <option value="">-- Pilih Tahun Masuk --</option>
+                    {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                </div>
+                {errors.tahunMasuk && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.tahunMasuk}</p>}
+              </div>
+
+              {/* Status (Dropdown Mode) */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.status} 
+                      onChange={(e) => setHeaders({...headers, status: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.status} {formData.tipeData === 'Data Baru' && <span className="text-rose-500">*</span>}
+                </label>
+                <div className="relative">
+                  <select
+                    name="status"
+                    value={formData.status}
+                    onChange={handleInputChange}
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass}`}
+                  >
+                    <option value="Lulus">Lulus</option>
+                    <option value="Pindah">Pindah</option>
+                    <option value="Hanya Mesantren">Hanya Mesantren</option>
+                  </select>
+                  <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                </div>
+              </div>
+
+              {/* Kondisional: Jika PILIH LULUS */}
+              {formData.status === 'Lulus' && (
+                <div className={`p-4 rounded-xl border animate-fade-in ${isDark ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-50 border-slate-100'}`}>
+                  <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                    {appMode === 'modification' ? (
+                      <input 
+                        type="text" 
+                        value={headers.tahunLulus} 
+                        onChange={(e) => setHeaders({...headers, tahunLulus: e.target.value})}
+                        className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                      />
+                    ) : headers.tahunLulus} <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="tahunLulus"
+                      value={formData.tahunLulus}
+                      onChange={handleInputChange}
+                      className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${
+                        isDark ? 'bg-[#06241b] border-emerald-800/60 text-slate-100' : 'bg-white border-slate-250 text-slate-800'
+                      } ${errors.tahunLulus ? 'border-rose-500' : ''}`}
+                    >
+                      <option value="">-- Pilih Tahun Lulus --</option>
+                      {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                  </div>
+                  {errors.tahunLulus && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.tahunLulus}</p>}
+                </div>
+              )}
+
+              {/* Kondisional: Jika PILIH PINDAH */}
+              {formData.status === 'Pindah' && (
+                <div className={`p-4 rounded-xl border animate-fade-in ${isDark ? 'bg-rose-955/10 border-rose-900/30' : 'bg-slate-50 border-slate-100'}`}>
+                  <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                    {appMode === 'modification' ? (
+                      <input 
+                        type="text" 
+                        value={headers.alasanPindah} 
+                        onChange={(e) => setHeaders({...headers, alasanPindah: e.target.value})}
+                        className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                      />
+                    ) : headers.alasanPindah} <span className="text-rose-500">* (Title Case)</span>
+                  </label>
+                  <textarea
+                    name="alasanPindah"
+                    rows="2"
+                    value={formData.alasanPindah}
+                    onChange={handleInputChange}
+                    placeholder="Contoh: Ikut Orang Tua Pindah Rumah"
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all ${
+                      isDark ? 'bg-[#06241b] border-emerald-800/60 text-slate-100' : 'bg-white border-slate-250 text-slate-800'
+                    } ${errors.alasanPindah ? 'border-rose-500' : ''}`}
+                  />
+                  {errors.alasanPindah && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.alasanPindah}</p>}
+                </div>
+              )}
+
+              {/* Opsi Tahun Keluar */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                    {appMode === 'modification' ? (
+                      <input 
+                        type="text" 
+                        value={headers.tahunKeluarOpt} 
+                        onChange={(e) => setHeaders({...headers, tahunKeluarOpt: e.target.value})}
+                        className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                      />
+                    ) : headers.tahunKeluarOpt}
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="tahunKeluarOpt"
+                      value={formData.tahunKeluarOpt}
+                      onChange={handleInputChange}
+                      className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass}`}
+                    >
+                      <option value="Masih di pesantren">Masih di pesantren</option>
+                      <option value="Input Tahun">Input Tahun</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                  </div>
+                </div>
+
+                {/* Kondisional Input Tahun Keluar */}
+                {formData.tahunKeluarOpt === 'Input Tahun' && (
+                  <div className="animate-fade-in">
+                    <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                      {appMode === 'modification' ? (
+                        <input 
+                          type="text" 
+                          value={headers.tahunKeluar} 
+                          onChange={(e) => setHeaders({...headers, tahunKeluar: e.target.value})}
+                          className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                        />
+                      ) : headers.tahunKeluar} <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <select
+                        name="tahunKeluar"
+                        value={formData.tahunKeluar}
+                        onChange={handleInputChange}
+                        className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass} ${
+                          errors.tahunKeluar ? 'border-rose-500' : ''
+                        }`}
+                      >
+                        <option value="">-- Pilih Tahun Keluar --</option>
+                        {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                    </div>
+                    {errors.tahunKeluar && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.tahunKeluar}</p>}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 4: Karier & Motto */}
+          <div className={`rounded-2xl p-6 ${cardClass}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <Briefcase size={20} />
+              </div>
+              <div>
+                <h2 className={`text-sm font-bold uppercase tracking-wider ${titleClass}`}>Pekerjaan & Motto Hidup</h2>
+                <p className={`text-xs ${subTitleClass}`}>Informasi profesi saat ini dan prinsip perjuangan hidup</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Profesi */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.profesi} 
+                      onChange={(e) => setHeaders({...headers, profesi: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.profesi}
+                </label>
+                <div className="relative">
+                  <select
+                    name="profesi"
+                    value={formData.profesi}
+                    onChange={handleInputChange}
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all appearance-none ${inputClass}`}
+                  >
+                    {['Pengasuh Pesantren', 'PNS', 'PPPK', 'Guru', 'Karyawan', 'Pengusaha', 'Pedagang', 'Freelance', 'Mencari Pekerjaan', 'Mengurus Rumah Tangga', 'Lainnya'].map((prof) => (
+                      <option key={prof} value={prof}>{prof}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-3.5 text-slate-400 pointer-events-none" size={16} />
+                </div>
+              </div>
+
+              {/* Kondisional Profesi Lainnya */}
+              {formData.profesi === 'Lainnya' && (
+                <div className={`p-4 rounded-xl border animate-fade-in ${isDark ? 'bg-emerald-950/20 border-emerald-800/40' : 'bg-slate-50 border-slate-100'}`}>
+                  <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                    {appMode === 'modification' ? (
+                      <input 
+                        type="text" 
+                        value={headers.profesiLainnya} 
+                        onChange={(e) => setHeaders({...headers, profesiLainnya: e.target.value})}
+                        className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                      />
+                    ) : headers.profesiLainnya} <span className="text-rose-500">* (Title Case)</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="profesiLainnya"
+                    value={formData.profesiLainnya}
+                    onChange={handleInputChange}
+                    placeholder="Contoh: Anggota Legislatif, Penulis Buku"
+                    className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all ${
+                      isDark ? 'bg-[#06241b] border-emerald-800/60 text-slate-100' : 'bg-white border-slate-250 text-slate-800'
+                    } ${errors.profesiLainnya ? 'border-rose-500' : ''}`}
+                  />
+                  {errors.profesiLainnya && <p className="text-rose-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12}/> {errors.profesiLainnya}</p>}
+                </div>
+              )}
+
+              {/* Motto / Prinsip Hidup */}
+              <div>
+                <label className={`block text-xs font-semibold uppercase tracking-wider mb-1.5 ${labelClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.motto} 
+                      onChange={(e) => setHeaders({...headers, motto: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.motto} <span className="text-slate-400">(Title Case)</span>
+                </label>
+                <textarea
+                  name="motto"
+                  rows="3"
+                  value={formData.motto}
+                  onChange={handleInputChange}
+                  placeholder="Contoh: Berilmu Amaliyah, Beramal Ilmiyah, Serta Istiqomah Dalam Perjuangan."
+                  className={`w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all ${inputClass}`}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Section 5: Foto Profil */}
+          <div className={`rounded-2xl p-6 ${cardClass}`}>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
+                <Camera size={20} />
+              </div>
+              <div>
+                <h2 className={`text-sm font-bold uppercase tracking-wider ${titleClass}`}>
+                  {appMode === 'modification' ? (
+                    <input 
+                      type="text" 
+                      value={headers.fotoProfil} 
+                      onChange={(e) => setHeaders({...headers, fotoProfil: e.target.value})}
+                      className="bg-slate-100 text-slate-800 border border-slate-250 px-2 py-0.5 rounded outline-none text-[10px]"
+                    />
+                  ) : headers.fotoProfil} {formData.tipeData === 'Data Baru' && <span className="text-rose-500">*</span>}
+                </h2>
+                <p className={`text-xs ${subTitleClass}`}>Pilih berkas pasfoto formal terbaik maksimal 2MB</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl text-center ${
+                isDark ? 'bg-[#06241b] border-emerald-800/40' : 'bg-slate-50 border-slate-200'
+              }`}>
+                {photoBase64 ? (
+                  <div className="relative group">
+                    <img 
+                      src={photoBase64} 
+                      alt="Pratinjau" 
+                      className="w-40 h-40 object-cover rounded-2xl border-2 border-amber-400 shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPhotoBase64(null);
+                        setPhotoName('');
+                      }}
+                      className="absolute -top-2 -right-2 p-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-full transition-all shadow-md"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                    <p className={`text-xs mt-2 font-mono truncate max-w-[200px] ${isDark ? 'text-emerald-300' : 'text-emerald-800'}`}>{photoName}</p>
+                  </div>
+                ) : isCameraActive ? (
+                  <div className="w-full flex flex-col items-center">
+                    <video 
+                      ref={videoRef} 
+                      autoPlay 
+                      playsInline 
+                      className="w-full max-w-[320px] rounded-xl border border-emerald-500 shadow-sm"
+                    />
+                    <div className="flex gap-4 mt-4">
+                      <button
+                        type="button"
+                        onClick={capturePhoto}
+                        className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-full font-bold text-xs transition-all flex items-center gap-1.5"
+                      >
+                        <CheckCircle size={14} />
+                        Ambil Foto
+                      </button>
+                      <button
+                        type="button"
+                        onClick={stopCamera}
+                        className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-full font-bold text-xs transition-all"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Upload className="mx-auto text-slate-400" size={32} />
+                    <div className="text-xs text-slate-500">
+                      Seret berkas ke sini atau gunakan aksi di bawah ini
+                    </div>
+                  </div>
+                )}
+
+                {!isCameraActive && !photoBase64 && (
+                  <div className="flex flex-wrap gap-4 justify-center mt-4">
+                    <label className={`cursor-pointer px-4 py-2 border rounded-full font-bold text-xs transition-all flex items-center gap-1.5 shadow-xs ${
+                      isDark ? 'bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border-emerald-800' : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-705'
+                    }`}>
+                      <Upload size={14} className="text-slate-550" />
+                      Pilih dari Galeri
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileUpload} 
+                        className="hidden" 
+                      />
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={startCamera}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold text-xs transition-all flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Camera size={14} />
+                      Ambil Foto Kamera
+                    </button>
+                  </div>
+                )}
+                {errors.fotoProfil && <p className="text-rose-500 text-xs mt-2 flex items-center gap-1"><AlertCircle size={12}/> {errors.fotoProfil}</p>}
+              </div>
+            </div>
+          </div>
+
+          <canvas ref={canvasRef} className="hidden" />
+
+          {/* Action Buttons Footer */}
+          <div className="flex gap-4">
+            {appMode === 'modification' && (
+              <button
+                type="button"
+                onClick={handleSaveHeaders}
+                className="flex-1 py-4 bg-emerald-700 hover:bg-emerald-850 text-white rounded-2xl font-bold tracking-wider text-sm transition-all flex items-center justify-center gap-2 shadow-lg"
+              >
+                <Save size={18} />
+                SIMPAN MODIFIKASI HEADER & TEMA
+              </button>
+            )}
+
+            {appMode === 'registration' && (
+              <button
+                type="submit"
+                className="flex-1 py-4 bg-gradient-to-r from-emerald-700 via-emerald-800 to-amber-600 hover:from-emerald-600 hover:via-emerald-700 hover:to-amber-500 text-white font-extrabold tracking-wider text-sm rounded-2xl transition-all duration-355 transform active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg border border-emerald-600/20"
+              >
+                <Eye size={18} />
+                VERIFIKASI & PRATINJAU DATA
+              </button>
+            )}
+          </div>
+
+        </form>
+      </main>
+
+      {/* FOOTER */}
+      <footer className={`mt-20 border-t py-8 text-center text-xs ${
+        isDark ? 'border-emerald-900/60 text-slate-400' : 'border-slate-200/60 text-slate-505'
+      }`}>
+        <p>© {new Date().getFullYear()} Forum Silaturahmi Alumni NU Cempaka. Hak Cipta Dilindungi.</p>
+        <p className="mt-1 text-[10px] text-slate-550">Premium Responsive Web App designed with Elegance.</p>
+      </footer>
+
+      {/* --- PREVIEW MODAL --- */}
+      {isPreviewOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-3xl border border-emerald-100 w-full max-w-2xl overflow-hidden shadow-2xl animate-fade-in text-slate-850">
+            {/* Header Modal */}
+            <div className="bg-gradient-to-r from-emerald-800 to-[#0c3529] px-6 py-4 flex justify-between items-center text-white">
+              <div>
+                <h3 className="font-extrabold text-base tracking-wider uppercase">Konfirmasi & Pratinjau Data</h3>
+                <p className="text-[10px] text-emerald-200">Silakan koreksi kembali sebelum mengirim ke sistem basis data</p>
+              </div>
+              <button 
+                onClick={() => setIsPreviewOpen(false)}
+                className="text-white hover:text-amber-200 text-lg font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 max-h-[70vh] overflow-y-auto space-y-6">
+              
+              <div className="flex flex-col sm:flex-row items-center gap-6 p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100">
+                {photoBase64 ? (
+                  <img 
+                    src={photoBase64} 
+                    alt="Preview" 
+                    className="w-24 h-24 sm:w-28 sm:h-28 object-cover rounded-2xl border-2 border-amber-400 shadow-md"
+                  />
+                ) : (
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 text-xs">
+                    No Photo
+                  </div>
+                )}
+                <div className="text-center sm:text-left space-y-1">
+                  <span className="px-2 py-0.5 bg-amber-400 text-slate-955 text-[9px] font-bold rounded uppercase tracking-wider">
+                    {formData.tipeData}
+                  </span>
+                  <h4 className="text-slate-900 font-extrabold text-lg tracking-tight">{formData.namaLengkap}</h4>
+                  <p className="text-slate-655 text-sm">{formData.panggilan ? `"${formData.panggilan}"` : '-'}</p>
+                  <p className="text-xs text-emerald-805 font-semibold">{formData.jenisKelamin}</p>
+                </div>
+              </div>
+
+              {/* Data Table */}
+              <div className="space-y-4 text-xs">
+                <div className="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-slate-100 pt-4">
+                  
+                  <div>
+                    <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Tempat & Tanggal Lahir</span>
+                    <span className="text-slate-800 font-semibold">{formData.tempatLahir}, {formData.tanggalLahir}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Nomor Handphone</span>
+                    <span className="text-slate-800 font-semibold">{formData.noHp ? `+62 ${formData.noHp}` : '-'}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Tahun Masuk</span>
+                    <span className="text-slate-800 font-semibold">{formData.tahunMasuk || '-'}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Status Alumni</span>
+                    <span className="text-slate-850 font-semibold">{formData.status}</span>
+                  </div>
+
+                  {formData.status === 'Lulus' && (
+                    <div>
+                      <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Tahun Lulus</span>
+                      <span className="text-slate-850 font-semibold">{formData.tahunLulus}</span>
+                    </div>
+                  )}
+
+                  {formData.status === 'Pindah' && (
+                    <div className="col-span-2">
+                      <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Alasan Pindah</span>
+                      <span className="text-slate-850 font-semibold">{formData.alasanPindah}</span>
+                    </div>
+                  )}
+
+                  <div>
+                    <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Tahun Keluar</span>
+                    <span className="text-slate-850 font-semibold">
+                      {formData.tahunKeluarOpt === 'Input Tahun' ? formData.tahunKeluar : formData.tahunKeluarOpt}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 uppercase font-bold text-[9px] block mb-0.5">Profesi Saat Ini</span>
+                    <span className="text-slate-850 font-semibold">
+                      {formData.profesi === 'Lainnya' ? formData.profesiLainnya : formData.profesi}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 pt-4">
+                  <span className="text-slate-400 uppercase font-bold text-[9px] block mb-1">Motto Hidup / Prinsip Hidup</span>
+                  <p className="text-slate-700 italic font-serif leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    {formData.motto ? `"${formData.motto}"` : '-'}
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Action Footer */}
+            <div className="bg-slate-50 px-6 py-4 border-t border-slate-100 flex gap-4">
+              <button
+                onClick={() => setIsPreviewOpen(false)}
+                className="flex-1 py-3 border border-slate-200 hover:bg-slate-100 text-slate-700 font-semibold text-xs rounded-xl transition-all"
+              >
+                Revisi Kembali
+              </button>
+              <button
+                onClick={handleSubmitData}
+                className="flex-1 py-3 bg-gradient-to-r from-emerald-700 to-amber-600 hover:from-emerald-600 hover:to-amber-500 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <CheckCircle size={14} />
+                KIRIM SEKARANG
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- PASSWORD SECURITY MODAL --- */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl border border-slate-100 p-6 max-w-sm w-full shadow-2xl text-center space-y-4 text-slate-800 animate-fade-in">
+            <Lock className="mx-auto text-emerald-700" size={32} />
+            <div>
+              <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">Verifikasi Akses Admin</h3>
+              <p className="text-xs text-slate-500 mt-1">Gunakan sandi keamanan "owner01" untuk membuka pengaturan konfigurasi form.</p>
+            </div>
+            
+            <input 
+              type="password"
+              placeholder="Sandi keamanan..."
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-center text-emerald-850 outline-none focus:border-emerald-600 transition-all text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleCheckPassword();
+              }}
+            />
+            {passwordError && <p className="text-rose-500 text-[10px] font-medium">{passwordError}</p>}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs rounded-lg transition-all font-semibold"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleCheckPassword}
+                className="flex-1 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-lg transition-all"
+              >
+                Verifikasi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Glass Spinner */}
+      {isSubmitting && (
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs flex flex-col items-center justify-center space-y-3">
+          <div className="p-4 bg-white rounded-2xl shadow-xl flex flex-col items-center gap-3 border border-slate-100">
+            <RefreshCw className="animate-spin text-emerald-700" size={36} />
+            <p className="text-slate-800 font-bold text-[11px] tracking-wider uppercase animate-pulse">{statusMessage}</p>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+</body>
+</html>
